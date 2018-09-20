@@ -14,7 +14,8 @@ class ContourCreator
 public:
 	ContourCreator(const Mat& src, Mat& dst);
 	~ContourCreator();
-
+	//this is additional line in classessRefactor
+	//and another 1
 	static void drawContours(const Mat& src, Mat& dst);
 	static void addText(Mat& src, const char* textToAdd);
 	void drawFrameRectangle(const Mat& src, Mat& dst);
