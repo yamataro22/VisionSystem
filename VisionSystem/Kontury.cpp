@@ -3,7 +3,7 @@
 
 
 
-ContourCreator::ContourCreator(const Mat& src, Mat& dst)
+ContourCreator::ContourCreator()
 {
 }
 
@@ -14,23 +14,11 @@ ContourCreator::~ContourCreator()
 void ContourCreator::drawContours(const Mat& src, Mat& dst)
 {
 	dst = Mat::zeros(src.size(), CV_8UC3);
-	vector<vector<Point> > contours;
-	cv::findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
-	vector<RotatedRect> minRect(contours.size());
 
-	for (size_t i = 0; i < contours.size(); i++)
-	{
-		minRect[i] = minAreaRect(contours[i]);
-	}
+	findContours(src);
+	findRectangles(src);
+	drawContoursToDst(dst);
 
-	auto index = getFrameRectangleIndex(minRect, contours);
-
-	Scalar color = Scalar(0, 255, 0);
-
-	for (size_t i = 0; i < contours.size(); i++)
-	{
-		cv::drawContours(dst, contours, (int)i, color);
-	}
 }
 
 void ContourCreator::addText(Mat& src, const char * text)
@@ -48,33 +36,59 @@ void ContourCreator::addText(Mat& src, const char * text)
 
 void ContourCreator::drawFrameRectangle(const Mat& src, Mat& dst)
 {
-	vector<vector<Point> > contours;
-	cv::findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
-	vector<RotatedRect> minRect(contours.size());
+	dst = Mat::zeros(src.size(), CV_8UC3);
 
+	findRectangles(src);
+	drawContoursToDst(dst);
+
+	auto index = getFrameRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
+	
+	Point2f rect_points[4];	//punkty najwiekszego prostokata
+	minRect[index].points(rect_points);
+
+	shapesToDraw.push_back(RamkaPodloza(rect_points));
+	drawShapes(dst);
+
+}
+
+void ContourCreator::findContours(const Mat& src)
+{
+	cv::findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+}
+
+void ContourCreator::findRectangles(const Mat & src)
+{
+	if (contours.data() == nullptr)
+	{
+		findContours(src);
+	}
+	minRect.reserve(contours.size());
 	for (size_t i = 0; i < contours.size(); i++)
 	{
 		minRect[i] = minAreaRect(contours[i]);
 	}
+}
 
-	auto index = getFrameRectangleIndex(minRect, contours);
-
-	cout << "indeks: " << index << endl;
-	Scalar color = Scalar(0, 255, 0);
-	dst = Mat::zeros(src.size(), CV_8UC3);
+void ContourCreator::drawContoursToDst(Mat & dst)
+{
+	if (contours.data() == nullptr)
+	{
+		cout << "brak konturow" << endl;
+		exit(1);
+	}
+		
 	for (size_t i = 0; i < contours.size(); i++)
 	{
-		cv::drawContours(dst, contours, (int)i, color);
+		cv::drawContours(dst, contours, (int)i, Scalar(0, 255, 0));
 	}
+}
 
-	Point2f rect_points[4];
-	
-
-	minRect[index].points(rect_points);
-	shapesToDraw.push_back(RamkaPodloza(rect_points));
-	shapesToDraw.push_back(CoordinateSystem(rect_points));
-	
-	shapesToDraw[0].drawShape(dst);
+void ContourCreator::drawShapes(Mat & dst)
+{
+	for (int i = 0; i < shapesToDraw.size(); i++)
+	{
+		shapesToDraw[i].drawShape(dst);
+	}
 }
 
 int ContourCreator::getFrameRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours)

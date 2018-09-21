@@ -44,7 +44,6 @@ private:
 	VideoCapture cap;
 	vector <filters> filTab;
 	vector <void (Video::*)(void)> jobList;
-	ContourCreator *contours;
 
 
 	void checkIfOpened();

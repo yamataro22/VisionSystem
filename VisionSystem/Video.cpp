@@ -98,20 +98,22 @@ void Video::clearJobs()
 
 void Video::findContours()
 {
+	ContourCreator contours;
 	namedWindow("contours", CV_WINDOW_AUTOSIZE);
 	applyFilters();
 	Mat dst;
-	ContourCreator::drawContours(outputFrame, dst);
+	contours.drawContours(outputFrame, dst);
 	imshow("contours", dst);	
 }
 
 void Video::drawFrame()
 {
-	namedWindow("frame", CV_WINDOW_AUTOSIZE);
-	ContourCreator noweKontury;
-	applyFilters();
 	Mat dst;
-	noweKontury.drawFrameRectangle(currentFrame, dst);
+	ContourCreator frameContours;
+	namedWindow("frame", CV_WINDOW_AUTOSIZE);
+	
+	applyFilters();
+	frameContours.drawFrameRectangle(currentFrame, dst);
 	imshow("contours", dst);
 }
 

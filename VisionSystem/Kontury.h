@@ -12,23 +12,21 @@ using namespace std;
 class ContourCreator
 {
 public:
-	ContourCreator(const Mat& src, Mat& dst);
+	ContourCreator();
 	~ContourCreator();
-	//this is additional line in classessRefactor
-	//and another 1
-	static void drawContours(const Mat& src, Mat& dst);
-	static void addText(Mat& src, const char* textToAdd);
+
+	void drawContours(const Mat& src, Mat& dst);
+	void addText(Mat& src, const char* textToAdd);
 	void drawFrameRectangle(const Mat& src, Mat& dst);
 private:
+	vector<vector<Point> > contours;
+	vector<RotatedRect> minRect;
 	vector<Ksztalt> shapesToDraw;
+	void findContours(const Mat& src);
+	void findRectangles(const Mat& src);
+	void drawContoursToDst(Mat& dst);
+	void drawShapes(Mat & dst);
 	static int getFrameRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours);
 	
-	/*
-	static void giveCoordPoints(Point2f points[]);
-	static void sortPoints(Point2f points[]);
-	static void showPoints(Point2f p[]);
-	static void drawCoordinateSystem(Mat& currentMat, Point2f tab[]);
-	*/
-
 };
 
