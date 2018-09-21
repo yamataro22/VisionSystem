@@ -111,9 +111,8 @@ void Video::drawFrame()
 	Mat dst;
 	ContourCreator frameContours;
 	namedWindow("frame", CV_WINDOW_AUTOSIZE);
-	
 	applyFilters();
-	frameContours.drawFrameRectangle(currentFrame, dst);
+	frameContours.drawFrameRectangle(outputFrame, dst);
 	imshow("contours", dst);
 }
 

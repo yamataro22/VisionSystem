@@ -51,6 +51,22 @@ void ContourCreator::drawFrameRectangle(const Mat& src, Mat& dst)
 
 }
 
+void ContourCreator::drawCoordinateSystem(const Mat & src, Mat & dst)
+{
+	dst = Mat::zeros(src.size(), CV_8UC3);
+
+	findRectangles(src);
+	drawContoursToDst(dst);
+
+	auto index = getFrameRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
+
+	Point2f rect_points[4];	//punkty najwiekszego prostokata
+	minRect[index].points(rect_points);
+
+	shapesToDraw.push_back(RamkaPodloza(rect_points));
+	drawShapes(dst);
+}
+
 void ContourCreator::findContours(const Mat& src)
 {
 	cv::findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);

@@ -18,6 +18,7 @@ public:
 	void drawContours(const Mat& src, Mat& dst);
 	void addText(Mat& src, const char* textToAdd);
 	void drawFrameRectangle(const Mat& src, Mat& dst);
+	void drawCoordinateSystem(const Mat& src, Mat & dst);
 private:
 	vector<vector<Point> > contours;
 	vector<RotatedRect> minRect;
