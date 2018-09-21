@@ -3,22 +3,41 @@
 
 
 
-ContourCreator::ContourCreator()
+ContourCreator::ContourCreator(const Mat& s):src(s)
 {
+	findContours();
 }
 
 ContourCreator::~ContourCreator()
 {
 }
 
-void ContourCreator::drawContours(const Mat& src, Mat& dst)
+void ContourCreator::addFrame()
+{
+	findRectangles();
+	auto index = getFrameRectangleIndex(minRect, contours);
+	Point2f rect_points[4];	//punkty najwiekszego prostokata
+	minRect[index].points(rect_points);
+	shapesToDraw.push_back(RamkaPodloza(rect_points));
+}
+
+void ContourCreator::addCoordinateSystem()
+{
+	findRectangles();
+	auto index = getFrameRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
+	Point2f rect_points[4];	//punkty najwiekszego prostokata
+	minRect[index].points(rect_points);
+	shapesToDraw.push_back(CoordinateSystem(rect_points));
+}
+
+void ContourCreator::drawContoursOnly(Mat& dst)
 {
 	dst = Mat::zeros(src.size(), CV_8UC3);
 
-	findContours(src);
-	findRectangles(src);
-	drawContoursToDst(dst);
-
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		cv::drawContours(dst, contours, (int)i, Scalar(0, 255, 0));
+	}
 }
 
 void ContourCreator::addText(Mat& src, const char * text)
@@ -34,49 +53,17 @@ void ContourCreator::addText(Mat& src, const char * text)
 	putText(src, text, org, FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 0, 255), 2, lineType);
 }
 
-void ContourCreator::drawFrameRectangle(const Mat& src, Mat& dst)
-{
-	dst = Mat::zeros(src.size(), CV_8UC3);
 
-	findRectangles(src);
-	drawContoursToDst(dst);
-
-	auto index = getFrameRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
-	
-	Point2f rect_points[4];	//punkty najwiekszego prostokata
-	minRect[index].points(rect_points);
-
-	shapesToDraw.push_back(RamkaPodloza(rect_points));
-	drawShapes(dst);
-
-}
-
-void ContourCreator::drawCoordinateSystem(const Mat & src, Mat & dst)
-{
-	dst = Mat::zeros(src.size(), CV_8UC3);
-
-	findRectangles(src);
-	drawContoursToDst(dst);
-
-	auto index = getFrameRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
-
-	Point2f rect_points[4];	//punkty najwiekszego prostokata
-	minRect[index].points(rect_points);
-
-	shapesToDraw.push_back(RamkaPodloza(rect_points));
-	drawShapes(dst);
-}
-
-void ContourCreator::findContours(const Mat& src)
+void ContourCreator::findContours()
 {
 	cv::findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
 }
 
-void ContourCreator::findRectangles(const Mat & src)
+void ContourCreator::findRectangles()
 {
 	if (contours.data() == nullptr)
 	{
-		findContours(src);
+		findContours();
 	}
 	minRect.reserve(contours.size());
 	for (size_t i = 0; i < contours.size(); i++)
@@ -85,22 +72,9 @@ void ContourCreator::findRectangles(const Mat & src)
 	}
 }
 
-void ContourCreator::drawContoursToDst(Mat & dst)
+void ContourCreator::drawShapes(Mat& dst)
 {
-	if (contours.data() == nullptr)
-	{
-		cout << "brak konturow" << endl;
-		exit(1);
-	}
-		
-	for (size_t i = 0; i < contours.size(); i++)
-	{
-		cv::drawContours(dst, contours, (int)i, Scalar(0, 255, 0));
-	}
-}
-
-void ContourCreator::drawShapes(Mat & dst)
-{
+	dst = Mat::zeros(src.size(), CV_8UC3);
 	for (int i = 0; i < shapesToDraw.size(); i++)
 	{
 		shapesToDraw[i].drawShape(dst);

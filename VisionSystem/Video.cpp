@@ -84,10 +84,10 @@ void Video::addJob(jobs newJob)
 		addJob(&Video::processed);
 		break;
 	case 2:
-		addJob(&Video::findContours);
+		addJob(&Video::addContours);
 		break;
 	case 3:
-		addJob(&Video::drawFrame);
+		addJob(&Video::addFrame);
 	}
 }
 
@@ -96,24 +96,25 @@ void Video::clearJobs()
 	jobList.clear();
 }
 
-void Video::findContours()
+void Video::addContours()
 {
-	ContourCreator contours;
 	namedWindow("contours", CV_WINDOW_AUTOSIZE);
 	applyFilters();
+	ContourCreator contours(outputFrame);
 	Mat dst;
-	contours.drawContours(outputFrame, dst);
+	contours.drawContoursOnly(dst);
 	imshow("contours", dst);	
 }
 
-void Video::drawFrame()
+void Video::addFrame()
 {
-	Mat dst;
-	ContourCreator frameContours;
 	namedWindow("frame", CV_WINDOW_AUTOSIZE);
 	applyFilters();
-	frameContours.drawFrameRectangle(outputFrame, dst);
-	imshow("contours", dst);
+	ContourCreator contours(outputFrame);
+	contours.addFrame();
+	Mat dst;
+	contours.drawShapes(dst);
+	imshow("frame", dst);
 }
 
 

@@ -12,21 +12,24 @@ using namespace std;
 class ContourCreator
 {
 public:
-	ContourCreator();
+	ContourCreator(const Mat& src);
 	~ContourCreator();
 
-	void drawContours(const Mat& src, Mat& dst);
+	void addFrame();	//adds frame to joblist; drawShapes to execute
+	void addCoordinateSystem();
 	void addText(Mat& src, const char* textToAdd);
-	void drawFrameRectangle(const Mat& src, Mat& dst);
-	void drawCoordinateSystem(const Mat& src, Mat & dst);
+
+	void drawShapes(Mat& dst);
+	void drawContoursOnly(Mat& dst);
 private:
+	Mat src;
 	vector<vector<Point> > contours;
 	vector<RotatedRect> minRect;
 	vector<Ksztalt> shapesToDraw;
-	void findContours(const Mat& src);
-	void findRectangles(const Mat& src);
-	void drawContoursToDst(Mat& dst);
-	void drawShapes(Mat & dst);
+	void findContours();
+	void findRectangles();
+
+
 	static int getFrameRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours);
 	
 };

@@ -21,8 +21,8 @@ public:
 
 	void processed();
 	void source();
-	void findContours();
-	void drawFrame();
+	void addContours();
+	void addFrame();
 
 
 	void addFilter(filters);
