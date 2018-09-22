@@ -18,7 +18,7 @@ void ContourCreator::addFrame()
 	auto index = getFrameRectangleIndex(minRect, contours);
 	Point2f rect_points[4];	//punkty najwiekszego prostokata
 	minRect[index].points(rect_points);
-	shapesToDraw.push_back(RamkaPodloza(rect_points));
+	shapesToDraw.push_back(make_unique<RamkaPodloza>(rect_points));
 }
 
 void ContourCreator::addCoordinateSystem()
@@ -27,7 +27,7 @@ void ContourCreator::addCoordinateSystem()
 	auto index = getFrameRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
 	Point2f rect_points[4];	//punkty najwiekszego prostokata
 	minRect[index].points(rect_points);
-	shapesToDraw.push_back(CoordinateSystem(rect_points));
+	shapesToDraw.push_back(make_unique<CoordinateSystem>(rect_points));
 }
 
 void ContourCreator::drawContoursOnly(Mat& dst)
@@ -68,7 +68,7 @@ void ContourCreator::findRectangles()
 	minRect.reserve(contours.size());
 	for (size_t i = 0; i < contours.size(); i++)
 	{
-		minRect[i] = minAreaRect(contours[i]);
+		minRect.push_back(minAreaRect(contours[i]));
 	}
 }
 
@@ -77,7 +77,7 @@ void ContourCreator::drawShapes(Mat& dst)
 	dst = Mat::zeros(src.size(), CV_8UC3);
 	for (int i = 0; i < shapesToDraw.size(); i++)
 	{
-		shapesToDraw[i].drawShape(dst);
+		shapesToDraw[i]->drawShape(dst);
 	}
 }
 

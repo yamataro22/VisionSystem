@@ -4,8 +4,7 @@
 Ksztalt::Ksztalt(cv::Point2f points[])
 {
 	pointsOld = points;
-	int n = sizeof(points) / sizeof(points[0]);
-	for (int i = 0; i < 0; i++) 
+	for (int i = 0; i < 4; i++) 
 	{
 		pointsTab.push_back(points[i]);
 	}

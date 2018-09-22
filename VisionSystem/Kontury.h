@@ -22,10 +22,12 @@ public:
 	void drawShapes(Mat& dst);
 	void drawContoursOnly(Mat& dst);
 private:
+	typedef unique_ptr<Ksztalt> shapePtr;
+
 	Mat src;
 	vector<vector<Point> > contours;
 	vector<RotatedRect> minRect;
-	vector<Ksztalt> shapesToDraw;
+	vector<shapePtr> shapesToDraw;
 	void findContours();
 	void findRectangles();
 
