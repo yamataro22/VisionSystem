@@ -37,14 +37,31 @@ void ContourCreator::addObject()
 	{
 		findRectangles();
 	}
-	auto rectIndex = getBiggestRectangleIndex(minRect, contours);
-	Size2f frameSize = minRect[rectIndex].size;
-	Size2f rectSize;
-	minRect.erase(minRect.begin() + rectIndex);
+	sortByArea(minRect);
+	auto frameIndex = getBiggestRectangleIndex(minRect, contours);
+	eliminateDuplicates(minRect, frameIndex, 5);
+	minRect.erase(minRect.begin() + frameIndex);
 
 	Point2f rect_points[4];
-	minRect[rectIndex].points(rect_points);
-	shapesToDraw.push_back(make_unique<ObiektProstokatny>(rect_points));
+	minRect[0].points(rect_points);
+	objectToMove = make_unique<Ksztalt>(rect_points);
+	shapesToDraw.push_back(objectToMove);
+}
+
+void ContourCreator::addAllRectangles()
+{
+	if (minRect.empty())
+	{
+		findRectangles();
+	}
+	eliminateDuplicates(minRect, getBiggestRectangleIndex(minRect, contours), 5);
+	for (int i = 0; i < minRect.size(); i++)
+	{
+		Point2f rectPoints[4];
+		minRect[i].points(rectPoints);
+		shapesToDraw.push_back(make_unique<RamkaPodloza>(rectPoints));
+	}
+	cout << "Wykryto " << minRect.size() << "prostokatow" << endl;
 }
 
 void ContourCreator::drawContoursOnly(Mat& dst)
@@ -54,6 +71,21 @@ void ContourCreator::drawContoursOnly(Mat& dst)
 	for (size_t i = 0; i < contours.size(); i++)
 	{
 		cv::drawContours(dst, contours, (int)i, Scalar(0, 255, 0));
+	}
+}
+
+double * ContourCreator::getObjectRecativeCoords(Point2f* framePoints)
+{
+	if (objectToMove == nullptr)
+	{
+		return nullptr;
+	}
+	else
+	{
+		double * pointArray = new double[2];
+		ObiektProstokatny *obj = dynamic_cast<ObiektProstokatny*>(objectToMove.get());
+		Point2f centerPoint = obj->getCenterPoint();
+
 	}
 }
 
@@ -114,6 +146,41 @@ int ContourCreator::getBiggestRectangleIndex(const vector<RotatedRect> &boundRec
 		}
 	}
 	return index;
+}
+
+void ContourCreator::sortByArea(vector<RotatedRect> rectangles)
+{
+	for (int i = 0; i < rectangles.size()-1; i++)
+	{
+		for (int j = 0; j < rectangles.size() - 1; j++)
+		{
+			if (rectangles[j + 1].size.area() > rectangles[j].size.area())
+				swap(rectangles[j + 1], rectangles[j]);
+		}
+	}
+}
+
+void ContourCreator::eliminateDuplicates(vector<RotatedRect>& rectangles, int dupIndex, int percentError)
+{
+	auto frameArea = rectangles[dupIndex].size.area();
+	auto max = frameArea + percentError * 0.01*frameArea;
+	auto min = frameArea - percentError * 0.01*frameArea;
+	for (int i = 0; i < rectangles.size(); i++)
+	{
+		if (i == dupIndex)
+		{
+			continue;
+		}
+		else
+		{
+			auto currentArea = rectangles[i].size.area();
+			if ((currentArea > min) && (currentArea < max))
+			{
+				rectangles.erase(rectangles.begin() + i);
+			}
+		}
+	}
+
 }
 
 
