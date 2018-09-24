@@ -9,7 +9,7 @@
 using namespace std;
 using namespace cv;
 
-enum jobs { source, processed, contours, frame};
+enum jobs { source, processed, contours, frame, coordinateSystem, objectOnFrame};
 
 class Video
 {
@@ -23,6 +23,8 @@ public:
 	void source();
 	void addContours();
 	void addFrame();
+	void addCoordinateSystem();
+	void addObjectOnFrame();
 
 
 	void addFilter(filters);

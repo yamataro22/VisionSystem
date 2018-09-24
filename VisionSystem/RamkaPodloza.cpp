@@ -19,3 +19,5 @@ void RamkaPodloza::drawShape(cv::Mat & src)
 		line(src, pointsTab[j], pointsTab[(j + 1) % 4], Scalar(0, 255, 0));
 	}
 }
+
+

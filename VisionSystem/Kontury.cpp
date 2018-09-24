@@ -15,7 +15,7 @@ ContourCreator::~ContourCreator()
 void ContourCreator::addFrame()
 {
 	findRectangles();
-	auto index = getFrameRectangleIndex(minRect, contours);
+	auto index = getBiggestRectangleIndex(minRect, contours);
 	Point2f rect_points[4];	//punkty najwiekszego prostokata
 	minRect[index].points(rect_points);
 	shapesToDraw.push_back(make_unique<RamkaPodloza>(rect_points));
@@ -24,10 +24,27 @@ void ContourCreator::addFrame()
 void ContourCreator::addCoordinateSystem()
 {
 	findRectangles();
-	auto index = getFrameRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
+	auto index = getBiggestRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
 	Point2f rect_points[4];	//punkty najwiekszego prostokata
 	minRect[index].points(rect_points);
 	shapesToDraw.push_back(make_unique<CoordinateSystem>(rect_points));
+}
+
+void ContourCreator::addObject()
+{
+	
+	if (minRect.empty())
+	{
+		findRectangles();
+	}
+	auto rectIndex = getBiggestRectangleIndex(minRect, contours);
+	Size2f frameSize = minRect[rectIndex].size;
+	Size2f rectSize;
+	minRect.erase(minRect.begin() + rectIndex);
+
+	Point2f rect_points[4];
+	minRect[rectIndex].points(rect_points);
+	shapesToDraw.push_back(make_unique<ObiektProstokatny>(rect_points));
 }
 
 void ContourCreator::drawContoursOnly(Mat& dst)
@@ -74,14 +91,17 @@ void ContourCreator::findRectangles()
 
 void ContourCreator::drawShapes(Mat& dst)
 {
-	dst = Mat::zeros(src.size(), CV_8UC3);
+	if (dst.empty())
+	{
+		dst = Mat::zeros(src.size(), CV_8UC3);
+	}
 	for (int i = 0; i < shapesToDraw.size(); i++)
 	{
 		shapesToDraw[i]->drawShape(dst);
 	}
 }
 
-int ContourCreator::getFrameRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours)
+int ContourCreator::getBiggestRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours)
 {
 	int index = 0;
 	for (int i = 0, max = 0; i < boundRect.size(); i++)
@@ -95,6 +115,8 @@ int ContourCreator::getFrameRectangleIndex(const vector<RotatedRect> &boundRect,
 	}
 	return index;
 }
+
+
 
 
 

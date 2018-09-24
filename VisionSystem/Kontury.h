@@ -5,6 +5,7 @@
 #include "Ksztalt.h"
 #include "RamkaPodloza.h"
 #include "CoordinateSystem.h"
+#include "ObiektProstokatny.h"
 
 using namespace cv;
 using namespace std;
@@ -17,6 +18,8 @@ public:
 
 	void addFrame();	//adds frame to joblist; drawShapes to execute
 	void addCoordinateSystem();
+	void addObject();
+
 	void addText(Mat& src, const char* textToAdd);
 
 	void drawShapes(Mat& dst);
@@ -32,7 +35,7 @@ private:
 	void findRectangles();
 
 
-	static int getFrameRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours);
+	static int getBiggestRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours);
 	
 };
 

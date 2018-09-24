@@ -155,6 +155,7 @@
     <ClCompile Include="Kontury.cpp" />
     <ClCompile Include="Ksztalt.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObiektProstokatny.cpp" />
     <ClCompile Include="RamkaPodloza.cpp" />
     <ClCompile Include="Serwer.cpp" />
     <ClCompile Include="Video.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Kalibracja.h" />
     <ClInclude Include="Kontury.h" />
     <ClInclude Include="Ksztalt.h" />
+    <ClInclude Include="ObiektProstokatny.h" />
     <ClInclude Include="RamkaPodloza.h" />
     <ClInclude Include="Serwer.h" />
     <ClInclude Include="Video.h" />

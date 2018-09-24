@@ -88,7 +88,14 @@ void Video::addJob(jobs newJob)
 		break;
 	case 3:
 		addJob(&Video::addFrame);
+		break;
+	case 4:
+		addJob(&Video::addCoordinateSystem);
+		break;
+	case 5:
+		addJob(&Video::addObjectOnFrame);
 	}
+
 }
 
 void Video::clearJobs()
@@ -112,9 +119,31 @@ void Video::addFrame()
 	applyFilters();
 	ContourCreator contours(outputFrame);
 	contours.addFrame();
-	Mat dst;
-	contours.drawShapes(dst);
-	imshow("frame", dst);
+	//Mat dst;
+	contours.drawShapes(currentFrame);
+	imshow("frame", currentFrame);
+}
+
+void Video::addCoordinateSystem()
+{
+	namedWindow("coordinateSystem", CV_WINDOW_AUTOSIZE);
+	applyFilters();
+	ContourCreator contours(outputFrame);
+	contours.addCoordinateSystem();
+	//Mat dst;
+	contours.drawShapes(currentFrame);
+	imshow("coordinateSystem", currentFrame);
+}
+
+void Video::addObjectOnFrame()
+{
+	namedWindow("rectObj", CV_WINDOW_AUTOSIZE);
+	applyFilters();
+	ContourCreator contours(outputFrame);
+	contours.addFrame();
+	contours.addObject();
+	contours.drawShapes(currentFrame);
+	imshow("coordinateSystem", currentFrame);
 }
 
 
