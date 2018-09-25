@@ -25,21 +25,27 @@ public:
 
 	void drawShapes(Mat& dst);
 	void drawContoursOnly(Mat& dst);
-	double* getObjectRecativeCoords(Point2f* framePoints);
+	double *getRelativeObjectCoords();
+	double* getAbsoluteObjectCoords(double width, double height);
+
 private:
-	typedef unique_ptr<Ksztalt> shapePtr;
+	//typedef unique_ptr<Ksztalt> shapePtr;
 
 	Mat src;
 	vector<vector<Point> > contours;
 	vector<RotatedRect> minRect;
-	vector<shapePtr> shapesToDraw;
-	unique_ptr<Ksztalt> objectToMove;
+	vector<Ksztalt*> shapesToDraw;
+	Ksztalt* objToDraw;
+	Point2f centerCoords;
+
 	void findContours();
 	void findRectangles();
+	void updateCenterCoords(Point2f* framePoints);
 
 
 	static int getBiggestRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours);
 	void sortByArea(vector<RotatedRect> rectangles);
 	void eliminateDuplicates(vector<RotatedRect>& rectangles, int frameIndex, int percentError);
+	double * getFrameScale(double width, double height);
 };
 

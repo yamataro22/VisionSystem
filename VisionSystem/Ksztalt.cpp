@@ -10,6 +10,3 @@ Ksztalt::Ksztalt(cv::Point2f points[])
 	}
 }
 
-Ksztalt::~Ksztalt()
-{
-}

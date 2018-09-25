@@ -6,6 +6,7 @@
 #include "Filtr.h"
 #include "Kontury.h"
 
+
 using namespace std;
 using namespace cv;
 
@@ -35,7 +36,7 @@ public:
 	void addJob(jobs newJob);
 	void clearJobs();
 
-
+	double* getCurrentCoords();
 	~Video();
 
 private:
@@ -46,6 +47,7 @@ private:
 	VideoCapture cap;
 	vector <filters> filTab;
 	vector <void (Video::*)(void)> jobList;
+	double* currentCoords;
 
 
 	void checkIfOpened();

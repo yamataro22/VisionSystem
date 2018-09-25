@@ -10,6 +10,7 @@ ContourCreator::ContourCreator(const Mat& s):src(s)
 
 ContourCreator::~ContourCreator()
 {
+	delete objToDraw;
 }
 
 void ContourCreator::addFrame()
@@ -18,7 +19,7 @@ void ContourCreator::addFrame()
 	auto index = getBiggestRectangleIndex(minRect, contours);
 	Point2f rect_points[4];	//punkty najwiekszego prostokata
 	minRect[index].points(rect_points);
-	shapesToDraw.push_back(make_unique<RamkaPodloza>(rect_points));
+	shapesToDraw.push_back(new RamkaPodloza(rect_points));
 }
 
 void ContourCreator::addCoordinateSystem()
@@ -27,7 +28,7 @@ void ContourCreator::addCoordinateSystem()
 	auto index = getBiggestRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
 	Point2f rect_points[4];	//punkty najwiekszego prostokata
 	minRect[index].points(rect_points);
-	shapesToDraw.push_back(make_unique<CoordinateSystem>(rect_points));
+	shapesToDraw.push_back(new CoordinateSystem(rect_points));
 }
 
 void ContourCreator::addObject()
@@ -40,12 +41,14 @@ void ContourCreator::addObject()
 	sortByArea(minRect);
 	auto frameIndex = getBiggestRectangleIndex(minRect, contours);
 	eliminateDuplicates(minRect, frameIndex, 5);
+	frameIndex = getBiggestRectangleIndex(minRect, contours);
 	minRect.erase(minRect.begin() + frameIndex);
 
 	Point2f rect_points[4];
 	minRect[0].points(rect_points);
-	objectToMove = make_unique<Ksztalt>(rect_points);
-	shapesToDraw.push_back(objectToMove);
+	objToDraw = new ObiektProstokatny(rect_points);
+	updateCenterCoords(rect_points);
+	shapesToDraw.push_back(objToDraw);
 }
 
 void ContourCreator::addAllRectangles()
@@ -59,7 +62,7 @@ void ContourCreator::addAllRectangles()
 	{
 		Point2f rectPoints[4];
 		minRect[i].points(rectPoints);
-		shapesToDraw.push_back(make_unique<RamkaPodloza>(rectPoints));
+		shapesToDraw.push_back(new RamkaPodloza(rectPoints));
 	}
 	cout << "Wykryto " << minRect.size() << "prostokatow" << endl;
 }
@@ -74,19 +77,30 @@ void ContourCreator::drawContoursOnly(Mat& dst)
 	}
 }
 
-double * ContourCreator::getObjectRecativeCoords(Point2f* framePoints)
+double * ContourCreator::getRelativeObjectCoords()
 {
-	if (objectToMove == nullptr)
+	if (objToDraw == nullptr)
 	{
 		return nullptr;
 	}
 	else
 	{
-		double * pointArray = new double[2];
-		ObiektProstokatny *obj = dynamic_cast<ObiektProstokatny*>(objectToMove.get());
-		Point2f centerPoint = obj->getCenterPoint();
-
+		double* coordTab = new double[2];
+		RamkaPodloza * frame = dynamic_cast<RamkaPodloza*>(shapesToDraw[0]);
+		coordTab[0] = frame->getXCoord(centerCoords);
+		coordTab[1] = frame->getYCoord(centerCoords);
+		return coordTab;
 	}
+}
+
+double * ContourCreator::getAbsoluteObjectCoords(double width, double height)
+{
+	double* scaledCoords = getFrameScale(width, height);
+	double* realCoords = new double[2];
+	double* relCoords = getRelativeObjectCoords();
+	realCoords[0] = relCoords[0] * scaledCoords[0];
+	realCoords[1] = relCoords[1] * scaledCoords[1];
+	return realCoords;
 }
 
 void ContourCreator::addText(Mat& src, const char * text)
@@ -118,6 +132,20 @@ void ContourCreator::findRectangles()
 	for (size_t i = 0; i < contours.size(); i++)
 	{
 		minRect.push_back(minAreaRect(contours[i]));
+	}
+}
+
+void ContourCreator::updateCenterCoords(Point2f * framePoints)
+{
+	if (objToDraw == nullptr)
+	{
+		cout << "Najpierw dodaj koordynaty obiektu" << endl;
+		exit(1);
+	}
+	else
+	{
+		ObiektProstokatny *rect = static_cast<ObiektProstokatny*>(objToDraw);
+		centerCoords = rect->getCenterPoint();
 	}
 }
 
@@ -181,6 +209,19 @@ void ContourCreator::eliminateDuplicates(vector<RotatedRect>& rectangles, int du
 		}
 	}
 
+}
+
+double * ContourCreator::getFrameScale(double width, double height)
+{
+	double* scaleTab = new double[2];
+	RamkaPodloza * frame = dynamic_cast<RamkaPodloza*>(shapesToDraw[0]);
+	//cout << "Szerokosc ramki: " << frame->getWidth() << endl;
+	//cout << "Wysokosc ramki: " << frame->getHeight() << endl;
+	scaleTab[0] = width / frame->getWidth();
+	scaleTab[1] = height / frame->getHeight();
+	//cout << "Skala szerokosc: " << scaleTab[0] << endl;
+	//cout << "Szerokosc wysokosc: " << scaleTab[1] << endl;
+	return scaleTab;
 }
 
 

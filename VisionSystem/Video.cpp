@@ -58,6 +58,8 @@ void Video::clearFilTab()
 
 void Video::startStreaming()
 {
+
+
 	while (1)
 	{
 		readFrame();
@@ -66,6 +68,7 @@ void Video::startStreaming()
 		if (waitForKey(30, 27))
 			break;
 	}
+
 }
 
 void Video::addJob(void (Video::*f)())
@@ -142,10 +145,19 @@ void Video::addObjectOnFrame()
 	ContourCreator contours(outputFrame);
 	contours.addFrame();
 	contours.addObject();
+
+	currentCoords = contours.getAbsoluteObjectCoords(420, 297);
+	if (currentCoords != nullptr) cout << "Wspolrzedne: " << currentCoords[0] << " " << currentCoords[1] << endl;
+
 	contours.drawShapes(currentFrame);
 	imshow("coordinateSystem", currentFrame);
 }
 
+
+double * Video::getCurrentCoords()
+{
+	return currentCoords;
+}
 
 Video::~Video()
 {
