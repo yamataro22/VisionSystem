@@ -7,8 +7,7 @@
 #include "CoordinateSystem.h"
 #include "ObiektProstokatny.h"
 
-using namespace cv;
-using namespace std;
+
 
 class ContourCreator
 {

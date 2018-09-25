@@ -1,14 +1,11 @@
 #pragma once
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgcodecs.hpp>
+
+#include "Kontury.h"
 #include "Kalibracja.h"
 #include "Filtr.h"
-#include "Kontury.h"
 
+#pragma comment (lib, "Ws2_32.lib")
 
-using namespace std;
-using namespace cv;
 
 enum jobs { source, processed, contours, frame, coordinateSystem, objectOnFrame};
 

@@ -1,5 +1,6 @@
 #include "Video.h"
-
+using namespace cv;
+using namespace std;
 
 
 Video::Video()
@@ -58,8 +59,6 @@ void Video::clearFilTab()
 
 void Video::startStreaming()
 {
-
-
 	while (1)
 	{
 		readFrame();
@@ -68,7 +67,6 @@ void Video::startStreaming()
 		if (waitForKey(30, 27))
 			break;
 	}
-
 }
 
 void Video::addJob(void (Video::*f)())

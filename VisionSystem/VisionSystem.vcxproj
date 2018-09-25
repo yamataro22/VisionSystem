@@ -158,6 +158,7 @@
     <ClCompile Include="ObiektProstokatny.cpp" />
     <ClCompile Include="RamkaPodloza.cpp" />
     <ClCompile Include="Serwer.cpp" />
+    <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="Video.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,7 @@
     <ClInclude Include="ObiektProstokatny.h" />
     <ClInclude Include="RamkaPodloza.h" />
     <ClInclude Include="Serwer.h" />
+    <ClInclude Include="TCPServer.h" />
     <ClInclude Include="Video.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
