@@ -57,15 +57,17 @@ void Video::clearFilTab()
 	filTab.clear();
 }
 
-void Video::startStreaming()
+void Video::startStreaming(double** message)
 {
 	while (1)
 	{
 		readFrame();
 		for (int i = 0; i < jobList.size(); i++)
 			(this->*jobList[i])();
+		*message = getCurrentCoords();
 		if (waitForKey(30, 27))
 			break;
+
 	}
 }
 
@@ -131,7 +133,6 @@ void Video::addCoordinateSystem()
 	applyFilters();
 	ContourCreator contours(outputFrame);
 	contours.addCoordinateSystem();
-	//Mat dst;
 	contours.drawShapes(currentFrame);
 	imshow("coordinateSystem", currentFrame);
 }
@@ -144,11 +145,11 @@ void Video::addObjectOnFrame()
 	contours.addFrame();
 	contours.addObject();
 
-	currentCoords = contours.getAbsoluteObjectCoords(420, 297);
-	if (currentCoords != nullptr) cout << "Wspolrzedne: " << currentCoords[0] << " " << currentCoords[1] << endl;
-
+	currentCoords = contours.getAbsoluteObjectCoords(SHEET_WIDTH, SHEET_HEIGHT);
+	//if (currentCoords != nullptr) cout << "Wspolrzedne: " << currentCoords[0] << " " << currentCoords[1] << endl;
+	checkCoords(0.8);
 	contours.drawShapes(currentFrame);
-	imshow("coordinateSystem", currentFrame);
+	imshow("rectObj", currentFrame);
 }
 
 
@@ -206,6 +207,19 @@ bool Video::waitForKey(int ms, int key)
 		return true;
 	}
 	return false;
+}
+
+void Video::checkCoords(double scale)
+{
+	if (currentCoords != nullptr)
+	{
+		if (currentCoords[0] > scale*SHEET_WIDTH || currentCoords[1] > scale*SHEET_HEIGHT)
+		{
+			delete currentCoords;
+			currentCoords = nullptr;
+		}
+			
+	}
 }
 
 

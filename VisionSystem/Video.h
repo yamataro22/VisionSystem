@@ -6,6 +6,8 @@
 
 #pragma comment (lib, "Ws2_32.lib")
 
+#define SHEET_WIDTH  210
+#define SHEET_HEIGHT  148
 
 enum jobs { source, processed, contours, frame, coordinateSystem, objectOnFrame};
 
@@ -28,7 +30,7 @@ public:
 	void addFilter(filters);
 	void clearFilTab();
 
-	void startStreaming();	
+	void startStreaming(double** message);	
 	void addJob(void (Video::*)());
 	void addJob(jobs newJob);
 	void clearJobs();
@@ -52,6 +54,7 @@ private:
 	void createFilTab();	//dodaje podstawowe filtry (gray, mBlur, thresh)
 	void applyFilters();	
 	bool waitForKey(int ms, int key);	//if true break
+	void checkCoords(double scale);
 	
 };
 

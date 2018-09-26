@@ -16,11 +16,14 @@ ContourCreator::~ContourCreator()
 
 void ContourCreator::addFrame()
 {
-	findRectangles();
-	auto index = getBiggestRectangleIndex(minRect, contours);
-	Point2f rect_points[4];	//punkty najwiekszego prostokata
-	minRect[index].points(rect_points);
-	shapesToDraw.push_back(new RamkaPodloza(rect_points));
+	if (findRectangles() != nullptr)
+	{
+		auto index = getBiggestRectangleIndex(minRect, contours);
+		Point2f rect_points[4];	//punkty najwiekszego prostokata
+		minRect[index].points(rect_points);
+		shapesToDraw.push_back(new RamkaPodloza(rect_points));
+	}
+
 }
 
 void ContourCreator::addCoordinateSystem()
@@ -34,22 +37,27 @@ void ContourCreator::addCoordinateSystem()
 
 void ContourCreator::addObject()
 {
-	
-	if (minRect.empty())
+	if (minRect.size() != 0)
 	{
-		findRectangles();
-	}
-	sortByArea(minRect);
-	auto frameIndex = getBiggestRectangleIndex(minRect, contours);
-	eliminateDuplicates(minRect, frameIndex, 5);
-	frameIndex = getBiggestRectangleIndex(minRect, contours);
-	minRect.erase(minRect.begin() + frameIndex);
+		sortByArea(minRect);
+		auto frameIndex = getBiggestRectangleIndex(minRect, contours);
+		eliminateDuplicates(minRect, frameIndex, 5);
+		frameIndex = getBiggestRectangleIndex(minRect, contours);
+		if (minRect.size() > 0)
+		{
+			minRect.erase(minRect.begin() + frameIndex);
+		}
 
-	Point2f rect_points[4];
-	minRect[0].points(rect_points);
-	objToDraw = new ObiektProstokatny(rect_points);
-	updateCenterCoords(rect_points);
-	shapesToDraw.push_back(objToDraw);
+
+		Point2f rect_points[4];
+		if (minRect.size() > 0)
+		{
+			minRect[0].points(rect_points);
+			objToDraw = new ObiektProstokatny(rect_points);
+			updateCenterCoords(rect_points);
+			shapesToDraw.push_back(objToDraw);
+		}
+	}
 }
 
 void ContourCreator::addAllRectangles()
@@ -96,9 +104,14 @@ double * ContourCreator::getRelativeObjectCoords()
 
 double * ContourCreator::getAbsoluteObjectCoords(double width, double height)
 {
+	
 	double* scaledCoords = getFrameScale(width, height);
 	double* realCoords = new double[2];
 	double* relCoords = getRelativeObjectCoords();
+	if (relCoords == nullptr || scaledCoords == nullptr)
+	{
+		return nullptr;
+	}
 	realCoords[0] = relCoords[0] * scaledCoords[0];
 	realCoords[1] = relCoords[1] * scaledCoords[1];
 	return realCoords;
@@ -123,17 +136,21 @@ void ContourCreator::findContours()
 	cv::findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
 }
 
-void ContourCreator::findRectangles()
+void* ContourCreator::findRectangles()
 {
-	if (contours.data() == nullptr)
+	if (contours.size() == 0)
 	{
-		findContours();
+		return nullptr;
 	}
-	minRect.reserve(contours.size());
-	for (size_t i = 0; i < contours.size(); i++)
+	else
 	{
-		minRect.push_back(minAreaRect(contours[i]));
+		minRect.reserve(contours.size());
+		for (size_t i = 0; i < contours.size(); i++)
+		{
+			minRect.push_back(minAreaRect(contours[i]));
+		}
 	}
+	
 }
 
 void ContourCreator::updateCenterCoords(Point2f * framePoints)
@@ -214,15 +231,18 @@ void ContourCreator::eliminateDuplicates(vector<RotatedRect>& rectangles, int du
 
 double * ContourCreator::getFrameScale(double width, double height)
 {
-	double* scaleTab = new double[2];
-	RamkaPodloza * frame = dynamic_cast<RamkaPodloza*>(shapesToDraw[0]);
-	//cout << "Szerokosc ramki: " << frame->getWidth() << endl;
-	//cout << "Wysokosc ramki: " << frame->getHeight() << endl;
-	scaleTab[0] = width / frame->getWidth();
-	scaleTab[1] = height / frame->getHeight();
-	//cout << "Skala szerokosc: " << scaleTab[0] << endl;
-	//cout << "Szerokosc wysokosc: " << scaleTab[1] << endl;
-	return scaleTab;
+	if (shapesToDraw.size() != 0)
+	{
+		double* scaleTab = new double[2];
+		RamkaPodloza * frame = dynamic_cast<RamkaPodloza*>(shapesToDraw[0]);
+		scaleTab[0] = width / frame->getWidth();
+		scaleTab[1] = height / frame->getHeight();
+		return scaleTab;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 

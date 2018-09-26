@@ -15,7 +15,7 @@ TCPServer::~TCPServer()
 
 void TCPServer::sendMsg(int clientSocket, std::string msg)
 {
-	send(clientSocket, msg.c_str(), msg.size() + 1, 0);
+	send(clientSocket, msg.c_str(), msg.size(), 0);
 }
 
 bool TCPServer::init()
@@ -44,6 +44,7 @@ void TCPServer::run()
 		SOCKET client = waitForConnection(listening);
 		if (client != INVALID_SOCKET)
 		{
+			std::cout << "polaczono z klientem" << std::endl;
 			closesocket(listening);
 			int bytesReceived = 0;
 			do
@@ -62,6 +63,7 @@ void TCPServer::run()
 			} while (bytesReceived > 0);
 
 			closesocket(client);
+			std::cout << "rozlaczono" << std::endl;
 			//wait for a connection
 			//loop receive/send
 		}
@@ -83,7 +85,7 @@ SOCKET TCPServer::createSocket()
 		sockaddr_in hint;
 		hint.sin_family = AF_INET;
 		hint.sin_port = htons(m_port);
-		inet_pton(AF_INET, m_ipAdress.c_str(), &hint.sin_addr);
+		hint.sin_addr.S_un.S_addr = INADDR_ANY;
 
 		int bindOk = bind(listening, (sockaddr*)&hint, sizeof(hint));
 		if (bindOk != SOCKET_ERROR)
@@ -104,7 +106,25 @@ SOCKET TCPServer::createSocket()
 
 SOCKET TCPServer::waitForConnection(SOCKET listening)
 {
-	SOCKET client = accept(listening, NULL, NULL);
+	sockaddr_in clientAddr;
+	int clientSize = sizeof(clientAddr);
+	SOCKET client = accept(listening, (sockaddr*)&clientAddr, &clientSize);
+	char host[NI_MAXHOST];
+	char service[NI_MAXHOST];
+
+	ZeroMemory(host, NI_MAXHOST);
+	ZeroMemory(service, NI_MAXSERV);
+
+	if (getnameinfo((sockaddr*)&clientAddr, sizeof(clientAddr), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
+	{
+		std::cout << host << "connection on port " << service << std::endl;
+	}
+	else
+	{
+		inet_ntop(AF_INET, &clientAddr.sin_addr, host, NI_MAXHOST);
+		std::cout << host << "connection on port " << ntohs(clientAddr.sin_port) << std::endl;
+	}
+
 	return client;
 }
 

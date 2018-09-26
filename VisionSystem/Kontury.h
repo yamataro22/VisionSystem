@@ -38,7 +38,7 @@ private:
 	Point2f centerCoords;
 
 	void findContours();
-	void findRectangles();
+	void* findRectangles();
 	void updateCenterCoords(Point2f* framePoints);
 
 
