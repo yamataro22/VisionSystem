@@ -21,6 +21,7 @@ public:
 
 	//send a message to a specified client
 	void sendMsg(int clientSocket, std::string msg);
+	void sendMsg(int clientSocket, int* tab);
 
 	//initialize winsock
 	bool init();
@@ -41,6 +42,5 @@ private:
 	std::string					m_ipAdress;
 	int							m_port;
 	MessageReceivedHandler		MessageReceived;
-
 };
 

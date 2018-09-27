@@ -54,32 +54,19 @@ void runVisionSystem()
 
 void listenerMessageReceived(TCPServer* listener, int client, string msg)
 {
-
 	cout << "Otrzymano: " << msg << endl;
-	string message;
-	string messageToSend;
 
-	message += to_string(static_cast<int>(20));
-	message += ",";
-	message += to_string(static_cast<int>(20));
-	messageToSend = toHex(message);
-	
-	cout << "wyslano: " << messageToSend << endl;
-
-	listener->sendMsg(client, messageToSend);
-	/*
-	if (currentCoords != nullptr)
+	if (currentCoords != nullptr && currentCoords[0] < 210 && currentCoords[1] < 150)
 	{
-		string message;
-		message += to_string(static_cast<int>(currentCoords[0]));
-		message += ",";
-		message += to_string(static_cast<int>(currentCoords[1]));
-
-		listener->sendMsg(client, toHex(message));
+		int tab[2];
+		tab[0] = static_cast<int>(currentCoords[0]);
+		tab[1] = static_cast<int>(currentCoords[1]);
+		listener->sendMsg(client, tab);
 	}
 	else
 	{
+		int tab[2] = { 0,0 };
 		listener->sendMsg(client, "brak danych\n");
 	}
-	*/
+
 }

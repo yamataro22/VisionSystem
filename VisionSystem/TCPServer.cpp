@@ -18,6 +18,30 @@ void TCPServer::sendMsg(int clientSocket, std::string msg)
 	send(clientSocket, msg.c_str(), msg.size(), 0);
 }
 
+void TCPServer::sendMsg(int clientSocket, int * tab)
+{
+	int charIndex = 0;
+	std::string int1 = std::to_string(tab[0]);
+	std::string int2 = std::to_string(tab[1]);
+	int length = int1.length() + int2.length() + 3;
+
+	char* buf = new char[length];
+
+	for (; charIndex < int1.length();)
+	{
+		buf[charIndex++] = int1.at(charIndex);
+	}
+	buf[charIndex++] = (char)',';
+	for (int i = 0, max = charIndex + int2.length(); charIndex < max;i++)
+	{
+		buf[charIndex++] = int2.at(i);
+	}
+	buf[charIndex++] = 0x0D;
+	buf[charIndex] = 0x0A;
+	
+	send(clientSocket, buf, length, 0);
+}
+
 bool TCPServer::init()
 {
 	WSAData data;
@@ -44,7 +68,7 @@ void TCPServer::run()
 		SOCKET client = waitForConnection(listening);
 		if (client != INVALID_SOCKET)
 		{
-			std::cout << "polaczono z klientem" << std::endl;
+			std::cout << "polaczono z robotem" << std::endl;
 			closesocket(listening);
 			int bytesReceived = 0;
 			do
@@ -117,12 +141,12 @@ SOCKET TCPServer::waitForConnection(SOCKET listening)
 
 	if (getnameinfo((sockaddr*)&clientAddr, sizeof(clientAddr), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
 	{
-		std::cout << host << "connection on port " << service << std::endl;
+		std::cout << "host: " << host << ";connection on port " << service << std::endl;
 	}
 	else
 	{
 		inet_ntop(AF_INET, &clientAddr.sin_addr, host, NI_MAXHOST);
-		std::cout << host << "connection on port " << ntohs(clientAddr.sin_port) << std::endl;
+		std::cout << "host: " << host << ";connection on port " << ntohs(clientAddr.sin_port) << std::endl;
 	}
 
 	return client;
