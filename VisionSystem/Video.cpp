@@ -1,4 +1,12 @@
 #include "Video.h"
+#include "Contours.h"
+#include "Calibration.h"
+#include "Filter.h"
+#include "MedianBlurFilter.h"
+#include "BinaryThreshFilter.h"
+#include "CannyFilter.h"
+#include "GrayFilter.h"
+
 using namespace cv;
 using namespace std;
 
@@ -23,14 +31,18 @@ Video::Video(const char * IPadress)
 
 void Video::calibrate()
 {
+	MedianBlurFilter l_mBlurFilter;
+	BinaryThreshFilter l_binaryThreshFilter;
+	CannyFilter l_cannyfilter;
+
 	readFrame();
-	fil.filtr(filters::mBlur, currentFrame);
+	l_mBlurFilter.filtr(currentFrame);
 	calib.setSource(currentFrame);
 	calib.startCalibrationThreshold();
-	fil.setThreshBinaryParam(calib.getThreshParam());
-	fil.filtr(threshBinary, currentFrame);
+	l_binaryThreshFilter.setBinaryThreshParam(calib.getThreshParam());
+	l_binaryThreshFilter.filtr(currentFrame);
 	calib.startCalibrationCanny();
-	fil.setCannyParams(calib.getCannyParam());
+	l_cannyfilter.setCannyParams(calib.getCannyParams());
 }
 
 void Video::processed()
@@ -46,15 +58,15 @@ void Video::source()
 	imshow("MySource", currentFrame);
 }
 
-void Video::addFilter(filters fil)
+void Video::addFilter(std::unique_ptr<Filter> p_filter)
 {
-	filTab.push_back(fil);
+	m_filTab.push_back(std::move(p_filter));
 }
 
 
 void Video::clearFilTab()
 {
-	filTab.clear();
+	m_filTab.clear();
 }
 
 void Video::startStreaming(double** message)
@@ -122,7 +134,6 @@ void Video::addFrame()
 	applyFilters();
 	ContourCreator contours(outputFrame);
 	contours.addFrame();
-	//Mat dst;
 	contours.drawShapes(currentFrame);
 	imshow("frame", currentFrame);
 }
@@ -146,7 +157,6 @@ void Video::addObjectOnFrame()
 	contours.addObject();
 
 	currentCoords = contours.getAbsoluteObjectCoords(SHEET_WIDTH, SHEET_HEIGHT);
-	//if (currentCoords != nullptr) cout << "Wspolrzedne: " << currentCoords[0] << " " << currentCoords[1] << endl;
 	checkCoords(0.8);
 	contours.drawShapes(currentFrame);
 	imshow("rectObj", currentFrame);
@@ -183,19 +193,18 @@ void Video::readFrame()
 
 void Video::createFilTab()
 {
-	filTab.push_back(gray);
-	filTab.push_back(mBlur);
-	filTab.push_back(filters::threshBinary);
-	filTab.push_back(filters::canny);
-
+	m_filTab.push_back(std::make_unique<GrayFilter>());
+	m_filTab.push_back(std::make_unique<MedianBlurFilter>());
+	m_filTab.push_back(std::make_unique<BinaryThreshFilter>());
+	m_filTab.push_back(std::make_unique<CannyFilter>());
 }
 
 void Video::applyFilters()
 {
 	currentFrame.copyTo(outputFrame);
-	for (int i = 0; i < filTab.size(); i++)
+	for (auto& filter : m_filTab)
 	{
-		fil.filtr(filTab[i], outputFrame);
+		filter->filtr(outputFrame);
 	}
 }
 

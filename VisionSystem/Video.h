@@ -1,8 +1,12 @@
 #pragma once
+#include <memory>
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include "Calibration.h"
 
-#include "Kontury.h"
-#include "Kalibracja.h"
-#include "Filtr.h"
+class Filter;
+class Contours;
+
 
 #pragma comment (lib, "Ws2_32.lib")
 
@@ -27,7 +31,7 @@ public:
 	void addObjectOnFrame();
 
 
-	void addFilter(filters);
+	void addFilter(std::unique_ptr<Filter>);
 	void clearFilTab();
 
 	void startStreaming(double** message);	
@@ -39,13 +43,12 @@ public:
 	~Video();
 
 private:
-	Mat currentFrame;
-	Mat outputFrame;
-	Kalibracja calib;
-	Filtr fil;
-	VideoCapture cap;
-	vector <filters> filTab;
-	vector <void (Video::*)(void)> jobList;
+	cv::Mat currentFrame;
+	cv::Mat outputFrame;
+	Calibration calib;
+	cv::VideoCapture cap;
+	std::vector <std::unique_ptr<Filter>> m_filTab;
+	std::vector <void (Video::*)(void)> jobList;
 	double* currentCoords;
 
 

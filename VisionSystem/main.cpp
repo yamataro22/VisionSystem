@@ -1,12 +1,16 @@
 #pragma once
 #include "TCPServer.h"
 #include  "Video.h"
-
 #include <thread>
+#include <iostream>
+#include <opencv2/opencv.hpp>
+using namespace cv;
+using namespace std;
+
 double* currentCoords;
 
 void listenerMessageReceived(TCPServer* listener, int client, string msg);
-string toHex(const string& s, bool upper_case = true);
+std::string toHex(const std::string& s, bool upper_case = true);
 void runServer();	
 void runVisionSystem();
 
@@ -23,7 +27,7 @@ int main()
 }
 
 
-string toHex(const string& s, bool upper_case)
+std::string toHex(const string& s, bool upper_case)
 {
 	ostringstream ret;
 

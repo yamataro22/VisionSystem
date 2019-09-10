@@ -1,17 +1,17 @@
-#include "ObiektProstokatny.h"
+#include "RectangularShape.h"
 
 
 
-ObiektProstokatny::ObiektProstokatny(cv::Point2f ppintTab[]) : RamkaPodloza(ppintTab)
+RectangularShape::RectangularShape(cv::Point2f ppintTab[]) : BaseFrame(ppintTab)
 {
 }
 
 
-ObiektProstokatny::~ObiektProstokatny()
+RectangularShape::~RectangularShape()
 {
 }
 
-Point2f ObiektProstokatny::getCenterPoint()
+Point2f RectangularShape::getCenterPoint()
 {
 	float xPos = (pointsTab[0].x + pointsTab[1].x + pointsTab[2].x + pointsTab[3].x)/4;
 	float yPos = (pointsTab[0].y + pointsTab[1].y + pointsTab[2].y + pointsTab[3].y) / 4;
@@ -19,7 +19,7 @@ Point2f ObiektProstokatny::getCenterPoint()
 	return Point2f(xPos, yPos);
 }
 
-void ObiektProstokatny::drawShape(cv::Mat & dst)
+void RectangularShape::drawShape(cv::Mat & dst)
 {
 	for (int j = 0; j < 4; j++)
 	{

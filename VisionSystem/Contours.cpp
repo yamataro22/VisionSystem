@@ -1,4 +1,9 @@
-#include "Kontury.h"
+#include "Contours.h"
+#include "Shape.h"
+#include "BaseFrame.h"
+#include "CoordinateSystem.h"
+#include "RectangularShape.h"
+
 using namespace cv;
 using namespace std;
 
@@ -21,7 +26,7 @@ void ContourCreator::addFrame()
 		auto index = getBiggestRectangleIndex(minRect, contours);
 		Point2f rect_points[4];	//punkty najwiekszego prostokata
 		minRect[index].points(rect_points);
-		shapesToDraw.push_back(new RamkaPodloza(rect_points));
+		shapesToDraw.push_back(new BaseFrame(rect_points));
 	}
 
 }
@@ -53,7 +58,7 @@ void ContourCreator::addObject()
 		if (minRect.size() > 0)
 		{
 			minRect[0].points(rect_points);
-			objToDraw = new ObiektProstokatny(rect_points);
+			objToDraw = new RectangularShape(rect_points);
 			updateCenterCoords(rect_points);
 			shapesToDraw.push_back(objToDraw);
 		}
@@ -71,7 +76,7 @@ void ContourCreator::addAllRectangles()
 	{
 		Point2f rectPoints[4];
 		minRect[i].points(rectPoints);
-		shapesToDraw.push_back(new RamkaPodloza(rectPoints));
+		shapesToDraw.push_back(new BaseFrame(rectPoints));
 	}
 	cout << "Wykryto " << minRect.size() << "prostokatow" << endl;
 }
@@ -95,7 +100,7 @@ double * ContourCreator::getRelativeObjectCoords()
 	else
 	{
 		double* coordTab = new double[2];
-		RamkaPodloza * frame = dynamic_cast<RamkaPodloza*>(shapesToDraw[0]);
+		BaseFrame * frame = dynamic_cast<BaseFrame*>(shapesToDraw[0]);
 		coordTab[0] = frame->getXCoord(centerCoords);
 		coordTab[1] = frame->getYCoord(centerCoords);
 		return coordTab;
@@ -162,7 +167,7 @@ void ContourCreator::updateCenterCoords(Point2f * framePoints)
 	}
 	else
 	{
-		ObiektProstokatny *rect = static_cast<ObiektProstokatny*>(objToDraw);
+		RectangularShape *rect = static_cast<RectangularShape*>(objToDraw);
 		centerCoords = rect->getCenterPoint();
 	}
 }
@@ -234,7 +239,7 @@ double * ContourCreator::getFrameScale(double width, double height)
 	if (shapesToDraw.size() != 0)
 	{
 		double* scaleTab = new double[2];
-		RamkaPodloza * frame = dynamic_cast<RamkaPodloza*>(shapesToDraw[0]);
+		BaseFrame * frame = dynamic_cast<BaseFrame*>(shapesToDraw[0]);
 		scaleTab[0] = width / frame->getWidth();
 		scaleTab[1] = height / frame->getHeight();
 		return scaleTab;

@@ -1,7 +1,7 @@
-#include "Ksztalt.h"
+#include "Shape.h"
 
 
-Ksztalt::Ksztalt(cv::Point2f points[])
+Shape::Shape(cv::Point2f points[])
 {
 	pointsOld = points;
 	for (int i = 0; i < 4; i++) 

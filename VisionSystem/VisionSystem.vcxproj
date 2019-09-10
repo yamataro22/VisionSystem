@@ -149,25 +149,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BinaryThreshFilter.cpp" />
+    <ClCompile Include="CannyFilter.cpp" />
     <ClCompile Include="CoordinateSystem.cpp" />
-    <ClCompile Include="Filtr.cpp" />
-    <ClCompile Include="Kalibracja.cpp" />
-    <ClCompile Include="Kontury.cpp" />
-    <ClCompile Include="Ksztalt.cpp" />
+    <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="Calibration.cpp" />
+    <ClCompile Include="Contours.cpp" />
+    <ClCompile Include="GrayFilter.cpp" />
+    <ClCompile Include="MedianBlurFilter.cpp" />
+    <ClCompile Include="RgbThreshFilter.cpp" />
+    <ClCompile Include="Shape.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ObiektProstokatny.cpp" />
-    <ClCompile Include="RamkaPodloza.cpp" />
+    <ClCompile Include="RectangularShape.cpp" />
+    <ClCompile Include="BaseFrame.cpp" />
     <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="Video.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BinaryThreshFilter.h" />
+    <ClInclude Include="CannyFilter.h" />
     <ClInclude Include="CoordinateSystem.h" />
-    <ClInclude Include="Filtr.h" />
-    <ClInclude Include="Kalibracja.h" />
-    <ClInclude Include="Kontury.h" />
-    <ClInclude Include="Ksztalt.h" />
-    <ClInclude Include="ObiektProstokatny.h" />
-    <ClInclude Include="RamkaPodloza.h" />
+    <ClInclude Include="Filter.h" />
+    <ClInclude Include="Calibration.h" />
+    <ClInclude Include="Contours.h" />
+    <ClInclude Include="GrayFilter.h" />
+    <ClInclude Include="MedianBlurFilter.h" />
+    <ClInclude Include="RgbThreshFilter.h" />
+    <ClInclude Include="Shape.h" />
+    <ClInclude Include="RectangularShape.h" />
+    <ClInclude Include="BaseFrame.h" />
     <ClInclude Include="TCPServer.h" />
     <ClInclude Include="Video.h" />
   </ItemGroup>

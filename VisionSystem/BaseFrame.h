@@ -1,13 +1,13 @@
 #pragma once
-#include "Ksztalt.h"
+#include "Shape.h"
 #include <cmath>
 
-class RamkaPodloza :
-	public Ksztalt
+class BaseFrame :
+	public Shape
 {
 public:
-	RamkaPodloza(cv::Point2f ppintTab[]);
-	~RamkaPodloza();
+	BaseFrame(cv::Point2f ppintTab[]);
+	~BaseFrame();
 	void drawShape(cv::Mat& dst) override;
 	double getXCoord(Point2f center);
 	double getYCoord(Point2d center);

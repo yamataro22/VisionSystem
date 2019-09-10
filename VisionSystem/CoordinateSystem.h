@@ -1,6 +1,7 @@
 #pragma once
-#include "Ksztalt.h"
-class CoordinateSystem :	public Ksztalt
+#include "Shape.h"
+
+class CoordinateSystem : public Shape
 {
 public:
 	CoordinateSystem(cv::Point2f ppintTab[]);

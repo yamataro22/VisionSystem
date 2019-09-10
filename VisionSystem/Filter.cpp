@@ -1,18 +1,18 @@
-#include "Filtr.h"
+#include "Filter.h"
 
 
 
-Filtr::Filtr():mBlurParam(9),gBlurMSize(3),threshBinaryParam(140)
+Filter::Filter():gBlurMSize(3)
 {
 
 }
 
 
-Filtr::~Filtr()
+Filter::~Filter()
 {
 }
 
-void Filtr::determineType(Mat & src)
+void Filter::determineType(Mat & src)
 {
 	int type = src.type();
 	string r;
@@ -37,7 +37,8 @@ void Filtr::determineType(Mat & src)
 	cout << "Typ maty: " << r << endl;
 }
 
-void Filtr::filtr(filters which, Mat& src)
+/*
+void Filter::filtr(Mat& src)
 {
 	switch (which)
 	{
@@ -55,7 +56,7 @@ void Filtr::filtr(filters which, Mat& src)
 		break;
 	case 4:
 		sharp(src);
-		break;		
+		break;
 	case 5:
 		threshColor(src);
 		break;
@@ -67,7 +68,7 @@ void Filtr::filtr(filters which, Mat& src)
 	}
 }
 
-void Filtr::filtr(filters which, Mat & src, Mat & dst)
+void Filter::filtr(Mat & src, Mat & dst)
 {
 	switch (which)
 	{
@@ -95,8 +96,10 @@ void Filtr::filtr(filters which, Mat & src, Mat & dst)
 		cout << "Nie wybrano porawnego filtru" << endl;
 	}
 }
+*/
 
-void Filtr::sobel(Mat & src, Mat & dst)
+
+void Filter::sobel(Mat & src, Mat & dst)
 {
 	Mat grad_x(src);
 	Mat grad_y(src);
@@ -111,7 +114,7 @@ void Filtr::sobel(Mat & src, Mat & dst)
 	addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, dst);
 }
 
-void Filtr::sobel(Mat & src, Mat & dst, sobelParams parametry)
+void Filter::sobel(Mat & src, Mat & dst, sobelParams parametry)
 {
 	Mat grad_x;
 	Mat grad_y;
@@ -124,94 +127,25 @@ void Filtr::sobel(Mat & src, Mat & dst, sobelParams parametry)
 	addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, dst);
 }
 
-void Filtr::canny(Mat & src, Mat & dst)
-{
-	Canny(src, dst, cannyParam.cannyThresh, cannyParam.cannyThresh*cannyParam.cannyRatio, cannyParam.cannyKernel);
-}
-
-void Filtr::canny(Mat & src, Mat & dst, cannyParams parametry)
-{
-	Canny(src, dst, parametry.cannyThresh, parametry.cannyThresh*parametry.cannyRatio, parametry.cannyKernel);
-}
-
-void Filtr::setmBlurParam(int newParam)
-{
-	mBlurParam = newParam;
-}
-
-void Filtr::setgBlurParam(int newParam)
+void Filter::setgBlurParam(int newParam)
 {
 	gBlurMSize = newParam;
 }
 
-void Filtr::setThreshBinaryParam(int newParam)
-{
-	threshBinaryParam = newParam;
-}
-
-void Filtr::setThreshRGBParams(int lowr, int lowg, int lowb, int highr, int highg, int highb)
-{
-	threshRGBParam = threshRGBParams(lowr, lowg, lowb, highr, highg, highb);
-}
-
-void Filtr::setThreshRGBParams(threshRGBParams newParams)
-{
-	threshRGBParam = newParams;
-}
-
-void Filtr::setCannyParams(cannyParams newParams)
-{
-	cannyParam.cannyKernel = newParams.cannyKernel;
-	cannyParam.cannyRatio = newParams.cannyRatio;
-	cannyParam.cannyThresh = newParams.cannyThresh;
-
-}
 
 
-void Filtr::gray(Mat & src)
-{
-	cvtColor(src, src, COLOR_BGR2GRAY);
-}
 
-void Filtr::gray(const Mat & src, Mat & dst)
-{
-	int type = src.type();
-	if (type == 0)
-		return;
-	cvtColor(src, dst, COLOR_BGR2GRAY);
-}
-
-void Filtr::thresh(Mat & src)
-{
-	threshold(src, src, threshBinaryParam, 255, 0);
-}
-
-void Filtr::thresh(const Mat & src, Mat & dst)
-{
-	threshold(src, dst, 130, 255, 0);
-}
-
-void Filtr::mBlur(Mat & src)
-{
-	medianBlur(src, src, mBlurParam);
-}
-
-void Filtr::mBlur(const Mat & src, Mat & dst)
-{
-	medianBlur(src, dst, mBlurParam);
-}
-
-void Filtr::gBlur(Mat & src)
+void Filter::gBlur(Mat & src)
 {
 	GaussianBlur(src, src, Size(gBlurMSize, gBlurMSize), 0, 0, BORDER_DEFAULT);
 }
 
-void Filtr::gBlur(const Mat & src, Mat & dst)
+void Filter::gBlur(const Mat & src, Mat & dst)
 {
 	GaussianBlur(src, dst, Size(gBlurMSize, gBlurMSize), 0, 0, BORDER_DEFAULT);
 }
 
-void Filtr::sharp(Mat & src)
+void Filter::sharp(Mat & src)
 {
 	CV_Assert(src.depth() == CV_8U);
 	Mat dst;
@@ -235,7 +169,7 @@ void Filtr::sharp(Mat & src)
 	dst.copyTo(src);
 }
 
-void Filtr::sharp(const Mat & src, Mat & dst)
+void Filter::sharp(const Mat & src, Mat & dst)
 {
 	CV_Assert(src.depth() == CV_8U);
 
@@ -258,43 +192,9 @@ void Filtr::sharp(const Mat & src, Mat & dst)
 	}
 }
 
-void Filtr::threshColor(Mat & src)
-{
-	inRange(src, Scalar(threshRGBParam.low_b, threshRGBParam.low_g, threshRGBParam.low_r)
-		, Scalar(threshRGBParam.high_b, threshRGBParam.high_g, threshRGBParam.high_r), src);
-}
-
-void Filtr::canny(Mat & src)
-{
-	Canny(src, src, cannyParam.cannyThresh, cannyParam.cannyThresh*cannyParam.cannyRatio, cannyParam.cannyKernel);
-}
-
-void Filtr::threshColor(const Mat & src, Mat & dst)
-{
-	inRange(src, Scalar(threshRGBParam.low_b, threshRGBParam.low_g, threshRGBParam.low_r)
-		, Scalar(threshRGBParam.high_b, threshRGBParam.high_g, threshRGBParam.high_r), dst);
-}
-
-
-
 sobelParams::sobelParams(int ddep, int ksiz, int del, int sc): ddepth(ddep), ksize(ksiz), delta(del), scale(sc)
 {
 
 }
-cannyParams::cannyParams() : cannyThresh(50), cannyRatio(3), cannyKernel(3)
-{
-}
-cannyParams::cannyParams(int cParam, int cRatio, int cKernel) : cannyThresh(cParam), cannyRatio(cRatio), cannyKernel(cKernel)
-{
-}
 
-threshRGBParams::threshRGBParams(int lowr, int lowg, int lowb, int highr, int highg, int highb)
-	:low_r(lowr),low_g(lowg),low_b(lowb),high_g(highg),high_b(highb)
-{
 
-}
-
-threshRGBParams::threshRGBParams(): low_r(30),low_g(30),low_b(30),high_r(100),high_g(100),high_b(100)
-{
-
-}

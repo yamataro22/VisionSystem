@@ -3,18 +3,19 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <iostream>
-#include "Filtr.h"
-
+#include "Filter.h"
+#include "CannyFilter.h"
+#include "RgbThreshFilter.h"
 
 using namespace cv;
 using namespace std;
 
-class Kalibracja
+class Calibration
 {
 public:
 
-	Kalibracja();
-	~Kalibracja();
+	Calibration();
+	~Calibration();
 
 	void setSource(Mat& source);
 	void startCalibrationThreshold();
@@ -24,19 +25,19 @@ public:
 	void showSource();
 	int getBlurParam();
 	int getThreshParam();
-	cannyParams getCannyParam();
-	threshRGBParams getRGBParam();
+	CannyParameters& getCannyParams();
 
 private:
 
 
 	Mat pCalib;
 	Mat aCalib;
+
+
 	int threshBinaryParam = 120;
 	int blurParam = 0;
-	cannyParams cannyParametry;
-	threshRGBParams rgbParametry;
-	
+	CannyParameters m_cannyParams;
+	RgbThreshParameters m_rgbThreshParams;
 
 	void configureTrackbar(const char* trackbarName, int* param, int maxVal, void func(int, void*), void* obj); //dodanie trackbaru do okna i koniguracja parametrów
 	static void setGrayFilter(void* obj);

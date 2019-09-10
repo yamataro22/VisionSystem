@@ -3,7 +3,7 @@
 
 
 
-CoordinateSystem::CoordinateSystem(cv::Point2f pointTab[]) : Ksztalt(pointTab)
+CoordinateSystem::CoordinateSystem(cv::Point2f pointTab[]) : Shape(pointTab)
 {
 
 }
