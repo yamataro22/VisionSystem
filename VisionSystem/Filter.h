@@ -5,18 +5,6 @@
 using namespace cv;
 using namespace std;
 
-enum filters{gray,mBlur,threshBinary,gauss,sharpen,threshRGB, canny};
-
-struct sobelParams {
-	int ddepth; //g³êbia obrazu
-	int ksize;
-	int delta;
-	int scale;
-
-	sobelParams(int ddep, int ksiz, int del, int sc);
-};
-
-
 
 class Filter
 {
@@ -28,14 +16,12 @@ public:
 	static void determineType(Mat& src);
 	virtual void filtr(Mat& src) = 0;
 	virtual void filtr(const Mat& src, Mat& dst) = 0;	
-	void sobel(Mat& src, Mat& dst);
-	void sobel(Mat & src, Mat & dst, sobelParams);
 
 	void setgBlurParam(int newParam);
 
 private:
 
-	Mat currentCalib;
+	Mat m_currentCalib;
 	int gBlurMSize;
 
 	void gBlur(Mat& src);

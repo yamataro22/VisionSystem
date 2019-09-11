@@ -4,7 +4,7 @@
 CannyParameters::CannyParameters() : cannyThresh(50), cannyRatio(3), cannyKernel(3)
 {
 }
-CannyParameters::CannyParameters(int cParam, int cRatio, int cKernel) : cannyThresh(cParam), cannyRatio(cRatio), cannyKernel(cKernel)
+CannyParameters::CannyParameters(int p_cParam, int p_cRatio, int p_cKernel) : cannyThresh(p_cParam), cannyRatio(p_cRatio), cannyKernel(p_cKernel)
 {
 }
 

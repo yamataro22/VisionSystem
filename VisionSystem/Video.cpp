@@ -14,19 +14,19 @@ using namespace std;
 Video::Video()
 {
 	createFilTab();
-	cap.open("http://192.168.1.10:8080/video?x.mjpeg");
+	m_videoCap.open("http://192.168.1.10:8080/video?x.mjpeg");
 	checkIfOpened();
-	jobList.push_back(&Video::source);
-	jobList.push_back(&Video::processed);
+	m_jobList.push_back(&Video::source);
+	m_jobList.push_back(&Video::processed);
 }
 
 Video::Video(const char * IPadress)
 {
 	createFilTab();
-	cap.open(IPadress);
+	m_videoCap.open(IPadress);
 	checkIfOpened();
-	jobList.push_back(&Video::source);
-	jobList.push_back(&Video::processed);
+	m_jobList.push_back(&Video::source);
+	m_jobList.push_back(&Video::processed);
 }
 
 void Video::calibrate()
@@ -36,26 +36,26 @@ void Video::calibrate()
 	CannyFilter l_cannyfilter;
 
 	readFrame();
-	l_mBlurFilter.filtr(currentFrame);
-	calib.setSource(currentFrame);
-	calib.startCalibrationThreshold();
-	l_binaryThreshFilter.setBinaryThreshParam(calib.getThreshParam());
-	l_binaryThreshFilter.filtr(currentFrame);
-	calib.startCalibrationCanny();
-	l_cannyfilter.setCannyParams(calib.getCannyParams());
+	l_mBlurFilter.filtr(m_currentFrame);
+	m_calibrator.setSource(m_currentFrame);
+	m_calibrator.startCalibrationThreshold();
+	l_binaryThreshFilter.setBinaryThreshParam(m_calibrator.getThreshParam());
+	l_binaryThreshFilter.filtr(m_currentFrame);
+	m_calibrator.startCalibrationCanny();
+	l_cannyfilter.setCannyParams(m_calibrator.getCannyParams());
 }
 
 void Video::processed()
 {
 	namedWindow("MyVideo", CV_WINDOW_AUTOSIZE);
 	applyFilters();
-	imshow("MyVideo", outputFrame);
+	imshow("MyVideo", m_outputFrame);
 }
 
 void Video::source()
 {
 	namedWindow("MySource", CV_WINDOW_AUTOSIZE);
-	imshow("MySource", currentFrame);
+	imshow("MySource", m_currentFrame);
 }
 
 void Video::addFilter(std::unique_ptr<Filter> p_filter)
@@ -69,14 +69,14 @@ void Video::clearFilTab()
 	m_filTab.clear();
 }
 
-void Video::startStreaming(double** message)
+void Video::startStreaming(std::shared_ptr<coords> p_coords)
 {
 	while (1)
 	{
 		readFrame();
-		for (int i = 0; i < jobList.size(); i++)
-			(this->*jobList[i])();
-		*message = getCurrentCoords();
+		for (int i = 0; i < m_jobList.size(); i++)
+			(this->*m_jobList[i])();
+		p_coords = std::move(m_currentCoords);
 		if (waitForKey(30, 27))
 			break;
 
@@ -85,7 +85,7 @@ void Video::startStreaming(double** message)
 
 void Video::addJob(void (Video::*f)())
 {
-	jobList.push_back(f);
+	m_jobList.push_back(f);
 }
 
 void Video::addJob(jobs newJob)
@@ -115,14 +115,14 @@ void Video::addJob(jobs newJob)
 
 void Video::clearJobs()
 {
-	jobList.clear();
+	m_jobList.clear();
 }
 
 void Video::addContours()
 {
 	namedWindow("contours", CV_WINDOW_AUTOSIZE);
 	applyFilters();
-	ContourCreator contours(outputFrame);
+	ContourCreator contours(m_outputFrame);
 	Mat dst;
 	contours.drawContoursOnly(dst);
 	imshow("contours", dst);	
@@ -132,41 +132,36 @@ void Video::addFrame()
 {
 	namedWindow("frame", CV_WINDOW_AUTOSIZE);
 	applyFilters();
-	ContourCreator contours(outputFrame);
+	ContourCreator contours(m_outputFrame);
 	contours.addFrame();
-	contours.drawShapes(currentFrame);
-	imshow("frame", currentFrame);
+	contours.drawShapes(m_currentFrame);
+	imshow("frame", m_currentFrame);
 }
 
 void Video::addCoordinateSystem()
 {
 	namedWindow("coordinateSystem", CV_WINDOW_AUTOSIZE);
 	applyFilters();
-	ContourCreator contours(outputFrame);
+	ContourCreator contours(m_outputFrame);
 	contours.addCoordinateSystem();
-	contours.drawShapes(currentFrame);
-	imshow("coordinateSystem", currentFrame);
+	contours.drawShapes(m_currentFrame);
+	imshow("coordinateSystem", m_currentFrame);
 }
 
 void Video::addObjectOnFrame()
 {
 	namedWindow("rectObj", CV_WINDOW_AUTOSIZE);
 	applyFilters();
-	ContourCreator contours(outputFrame);
+	ContourCreator contours(m_outputFrame);
 	contours.addFrame();
 	contours.addObject();
 
-	currentCoords = contours.getAbsoluteObjectCoords(SHEET_WIDTH, SHEET_HEIGHT);
+	m_currentCoords = contours.getAbsoluteObjectCoords(SHEET_WIDTH, SHEET_HEIGHT);
 	checkCoords(0.8);
-	contours.drawShapes(currentFrame);
-	imshow("rectObj", currentFrame);
+	contours.drawShapes(m_currentFrame);
+	imshow("rectObj", m_currentFrame);
 }
 
-
-double * Video::getCurrentCoords()
-{
-	return currentCoords;
-}
 
 Video::~Video()
 {
@@ -174,7 +169,7 @@ Video::~Video()
 
 void Video::checkIfOpened()
 {
-	if (!cap.isOpened())  // if not success, exit program
+	if (!m_videoCap.isOpened())  // if not success, exit program
 	{
 		cout << "Cannot open the video cam" << endl;
 		exit(1);
@@ -183,7 +178,7 @@ void Video::checkIfOpened()
 
 void Video::readFrame()
 {
-	bool bSuccess = cap.read(currentFrame); // read a new frame from video
+	bool bSuccess = m_videoCap.read(m_currentFrame); // read a new frame from video
 	if (!bSuccess) //if not success, break loop
 	{
 		cout << "Cannot read a frame from video stream" << endl;
@@ -201,10 +196,10 @@ void Video::createFilTab()
 
 void Video::applyFilters()
 {
-	currentFrame.copyTo(outputFrame);
+	m_currentFrame.copyTo(m_outputFrame);
 	for (auto& filter : m_filTab)
 	{
-		filter->filtr(outputFrame);
+		filter->filtr(m_outputFrame);
 	}
 }
 
@@ -220,12 +215,11 @@ bool Video::waitForKey(int ms, int key)
 
 void Video::checkCoords(double scale)
 {
-	if (currentCoords != nullptr)
+	if (m_currentCoords != nullptr)
 	{
-		if (currentCoords[0] > scale*SHEET_WIDTH || currentCoords[1] > scale*SHEET_HEIGHT)
+		if (m_currentCoords->first > scale*SHEET_WIDTH || m_currentCoords->first > scale*SHEET_HEIGHT)
 		{
-			delete currentCoords;
-			currentCoords = nullptr;
+			m_currentCoords = nullptr;
 		}
 			
 	}

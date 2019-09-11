@@ -4,15 +4,16 @@
 #include <thread>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+
 using namespace cv;
 using namespace std;
 
-double* currentCoords;
+using coords = std::pair<double, double>;
+std::shared_ptr<coords> currentCoords = std::make_shared<coords>(std::make_pair<double,double>(0.,0.));
 
 void listenerMessageReceived(TCPServer* listener, int client, string msg);
 std::string toHex(const std::string& s, bool upper_case = true);
 void runServer();	
-void runVisionSystem();
 
 int main()
 {
@@ -21,7 +22,7 @@ int main()
 	newVideo.calibrate();
 	newVideo.clearJobs();
 	newVideo.addJob(jobs::objectOnFrame);
-	newVideo.startStreaming(&currentCoords);
+	newVideo.startStreaming(currentCoords);
 
 	return 0;
 }
@@ -47,24 +48,15 @@ void runServer()
 	}
 }
 
-void runVisionSystem()
-{
-	Video newVideo("http://192.168.43.1:8080/video?x.mjpeg");
-	newVideo.calibrate();
-	newVideo.clearJobs();
-	newVideo.addJob(jobs::objectOnFrame);
-	newVideo.startStreaming(&currentCoords);
-}
-
 void listenerMessageReceived(TCPServer* listener, int client, string msg)
 {
-	cout << "Otrzymano: " << msg << endl;
+	cout << "Received: " << msg << endl;
 
-	if (currentCoords != nullptr && currentCoords[0] < 210 && currentCoords[1] < 150)
+	if (currentCoords != nullptr and currentCoords->first < 210 and currentCoords->second < 150)
 	{
 		int tab[2];
-		tab[0] = static_cast<int>(currentCoords[0]);
-		tab[1] = static_cast<int>(currentCoords[1]);
+		tab[0] = static_cast<int>(currentCoords->first);
+		tab[1] = static_cast<int>(currentCoords->first);
 		listener->sendMsg(client, tab);
 	}
 	else

@@ -37,103 +37,10 @@ void Filter::determineType(Mat & src)
 	cout << "Typ maty: " << r << endl;
 }
 
-/*
-void Filter::filtr(Mat& src)
-{
-	switch (which)
-	{
-	case 0:
-		gray(src);
-		break;
-	case 1:
-		mBlur(src);
-		break;
-	case 2:
-		thresh(src);
-		break;
-	case 3:
-		gBlur(src);
-		break;
-	case 4:
-		sharp(src);
-		break;
-	case 5:
-		threshColor(src);
-		break;
-	case 6:
-		canny(src);
-		break;
-	default:
-		cout << "Nie wybrano porawnego filtru" << endl;
-	}
-}
-
-void Filter::filtr(Mat & src, Mat & dst)
-{
-	switch (which)
-	{
-	case 0:
-		gray(src, dst);
-		break;
-	case 1:
-		mBlur(src, dst);
-		break;
-	case 2:
-		thresh(src, dst);
-		break;
-	case 3:
-		gBlur(src, dst);
-		break;
-	case 4:
-		sharp(src, dst);
-		break;
-	case 5:
-		threshColor(src, dst);
-	case 6:
-		canny(src, dst);
-		break;
-	default:
-		cout << "Nie wybrano porawnego filtru" << endl;
-	}
-}
-*/
-
-
-void Filter::sobel(Mat & src, Mat & dst)
-{
-	Mat grad_x(src);
-	Mat grad_y(src);
-	
-	Mat abs_grad_x, abs_grad_y;
-	sobelParams parametry(CV_16S, 1, 0, 1);
-	Sobel(src, grad_x, parametry.ddepth, 1, 0, parametry.ksize, parametry.scale, parametry.delta, BORDER_DEFAULT);
-	Sobel(src, grad_y, parametry.ddepth, 0, 1, parametry.ksize, parametry.scale, parametry.delta, BORDER_DEFAULT);
-
-	convertScaleAbs(grad_x, abs_grad_x);
-	convertScaleAbs(grad_y, abs_grad_y);
-	addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, dst);
-}
-
-void Filter::sobel(Mat & src, Mat & dst, sobelParams parametry)
-{
-	Mat grad_x;
-	Mat grad_y;
-	Mat abs_grad_x, abs_grad_y;
-	Sobel(src, grad_x, parametry.ddepth, 1, 0, parametry.ksize, parametry.scale, parametry.delta, BORDER_DEFAULT);
-	Sobel(src, grad_y, parametry.ddepth, 0, 1, parametry.ksize, parametry.scale, parametry.delta, BORDER_DEFAULT);
-
-	convertScaleAbs(grad_x, abs_grad_x);
-	convertScaleAbs(grad_y, abs_grad_y);
-	addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, dst);
-}
-
 void Filter::setgBlurParam(int newParam)
 {
 	gBlurMSize = newParam;
 }
-
-
-
 
 void Filter::gBlur(Mat & src)
 {
@@ -191,10 +98,4 @@ void Filter::sharp(const Mat & src, Mat & dst)
 		}
 	}
 }
-
-sobelParams::sobelParams(int ddep, int ksiz, int del, int sc): ddepth(ddep), ksize(ksiz), delta(del), scale(sc)
-{
-
-}
-
 

@@ -7,8 +7,6 @@
 using namespace cv;
 using namespace std;
 
-
-
 ContourCreator::ContourCreator(const Mat& s):src(s)
 {
 	findContours();
@@ -24,7 +22,7 @@ void ContourCreator::addFrame()
 	if (findRectangles() != nullptr)
 	{
 		auto index = getBiggestRectangleIndex(minRect, contours);
-		Point2f rect_points[4];	//punkty najwiekszego prostokata
+		Point2f rect_points[4];	//biggest rectangle points
 		minRect[index].points(rect_points);
 		shapesToDraw.push_back(new BaseFrame(rect_points));
 	}
@@ -34,8 +32,8 @@ void ContourCreator::addFrame()
 void ContourCreator::addCoordinateSystem()
 {
 	findRectangles();
-	auto index = getBiggestRectangleIndex(minRect, contours);	//indeks prostok¹ta ramki
-	Point2f rect_points[4];	//punkty najwiekszego prostokata
+	auto index = getBiggestRectangleIndex(minRect, contours);	//base rectangular index
+	Point2f rect_points[4];
 	minRect[index].points(rect_points);
 	shapesToDraw.push_back(new CoordinateSystem(rect_points));
 }
@@ -91,35 +89,36 @@ void ContourCreator::drawContoursOnly(Mat& dst)
 	}
 }
 
-double * ContourCreator::getRelativeObjectCoords()
+std::unique_ptr<coordPair> ContourCreator::getRelativeObjectCoords()
 {
-	if (objToDraw == nullptr)
+	if(objToDraw == nullptr)
 	{
 		return nullptr;
 	}
 	else
 	{
-		double* coordTab = new double[2];
+		coordPair l_coordTab;
 		BaseFrame * frame = dynamic_cast<BaseFrame*>(shapesToDraw[0]);
-		coordTab[0] = frame->getXCoord(centerCoords);
-		coordTab[1] = frame->getYCoord(centerCoords);
-		return coordTab;
+		l_coordTab.first = frame->getXCoord(centerCoords);
+		l_coordTab.second = frame->getYCoord(centerCoords);
+
+		return std::make_unique<coordPair>(l_coordTab);
 	}
 }
 
-double * ContourCreator::getAbsoluteObjectCoords(double width, double height)
+std::unique_ptr<coordPair>  ContourCreator::getAbsoluteObjectCoords(double p_width, double p_height)
 {
 	
-	double* scaledCoords = getFrameScale(width, height);
-	double* realCoords = new double[2];
-	double* relCoords = getRelativeObjectCoords();
-	if (relCoords == nullptr || scaledCoords == nullptr)
+	auto l_scaledCoords = getFrameScale(p_width, p_height);
+	coordPair l_realCoords;
+	auto l_relCoords = getRelativeObjectCoords();
+	if (l_relCoords == nullptr || l_scaledCoords == nullptr)
 	{
 		return nullptr;
 	}
-	realCoords[0] = relCoords[0] * scaledCoords[0];
-	realCoords[1] = relCoords[1] * scaledCoords[1];
-	return realCoords;
+	l_realCoords.first = l_relCoords->first * l_scaledCoords->first;
+	l_realCoords.second = l_relCoords->second * l_scaledCoords->second;
+	return std::make_unique<coordPair>(l_realCoords);
 }
 
 void ContourCreator::addText(Mat& src, const char * text)
@@ -162,7 +161,7 @@ void ContourCreator::updateCenterCoords(Point2f * framePoints)
 {
 	if (objToDraw == nullptr)
 	{
-		cout << "Najpierw dodaj koordynaty obiektu" << endl;
+		cout << "Add coordinates firstly" << endl;
 		exit(1);
 	}
 	else
@@ -234,15 +233,16 @@ void ContourCreator::eliminateDuplicates(vector<RotatedRect>& rectangles, int du
 
 }
 
-double * ContourCreator::getFrameScale(double width, double height)
+std::unique_ptr<coordPair> ContourCreator::getFrameScale(double width, double height)
 {
 	if (shapesToDraw.size() != 0)
 	{
-		double* scaleTab = new double[2];
+		coordPair l_scaleTab;
 		BaseFrame * frame = dynamic_cast<BaseFrame*>(shapesToDraw[0]);
-		scaleTab[0] = width / frame->getWidth();
-		scaleTab[1] = height / frame->getHeight();
-		return scaleTab;
+		l_scaleTab.first = width / frame->getWidth();
+		l_scaleTab.second = height / frame->getHeight();
+
+		return std::make_unique<coordPair>(l_scaleTab);
 	}
 	else
 	{

@@ -12,7 +12,7 @@ public:
 	CannyParameters();
 	CannyParameters(int, int, int);
 
-	CannyParameters& operator=(const CannyParameters& p_cannyParams) = default;
+	CannyParameters& operator=(const CannyParameters&) = default;
 	CannyParameters(const CannyParameters&) = default;
 };
 

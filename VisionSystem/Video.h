@@ -7,12 +7,12 @@
 class Filter;
 class Contours;
 
-
 #pragma comment (lib, "Ws2_32.lib")
 
 #define SHEET_WIDTH  210
 #define SHEET_HEIGHT  148
 
+using coords = std::pair<double, double>;
 enum jobs { source, processed, contours, frame, coordinateSystem, objectOnFrame};
 
 class Video
@@ -33,23 +33,21 @@ public:
 
 	void addFilter(std::unique_ptr<Filter>);
 	void clearFilTab();
-
-	void startStreaming(double** message);	
+	void startStreaming(std::shared_ptr<coords>);	
 	void addJob(void (Video::*)());
 	void addJob(jobs newJob);
 	void clearJobs();
 
-	double* getCurrentCoords();
 	~Video();
 
 private:
-	cv::Mat currentFrame;
-	cv::Mat outputFrame;
-	Calibration calib;
-	cv::VideoCapture cap;
+	cv::Mat m_currentFrame;
+	cv::Mat m_outputFrame;
+	Calibration m_calibrator;
+	cv::VideoCapture m_videoCap;
 	std::vector <std::unique_ptr<Filter>> m_filTab;
-	std::vector <void (Video::*)(void)> jobList;
-	double* currentCoords;
+	std::vector <void (Video::*)(void)> m_jobList;
+	std::unique_ptr<coords> m_currentCoords;
 
 
 	void checkIfOpened();

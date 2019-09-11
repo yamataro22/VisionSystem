@@ -162,6 +162,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RectangularShape.cpp" />
     <ClCompile Include="BaseFrame.cpp" />
+    <ClCompile Include="SobelFilter.cpp" />
     <ClCompile Include="TCPServer.cpp" />
     <ClCompile Include="Video.cpp" />
   </ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="Shape.h" />
     <ClInclude Include="RectangularShape.h" />
     <ClInclude Include="BaseFrame.h" />
+    <ClInclude Include="SobelFilter.h" />
     <ClInclude Include="TCPServer.h" />
     <ClInclude Include="Video.h" />
   </ItemGroup>
