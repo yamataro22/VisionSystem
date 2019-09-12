@@ -1,5 +1,7 @@
 #pragma once
 #include "Filter.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 struct RgbThreshParameters
 {
@@ -8,6 +10,8 @@ struct RgbThreshParameters
 
 	RgbThreshParameters(int, int, int, int, int, int);
 	RgbThreshParameters();
+	Scalar getLowRgbScalar();
+    Scalar getHighRgbScalar();
 };
 
 

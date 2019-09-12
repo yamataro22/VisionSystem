@@ -13,6 +13,13 @@ RgbThreshParameters::RgbThreshParameters(int p_lowr, int p_lowg, int p_lowb,
 {
 }
 
+Scalar RgbThreshParameters::getLowRgbScalar() {
+    return Scalar(low_b, low_g, low_r);
+}
+
+Scalar RgbThreshParameters::getHighRgbScalar() {
+    return Scalar(high_b, high_g, high_r);;
+}
 
 RgbThreshFilter::RgbThreshFilter()
 {
@@ -32,7 +39,7 @@ void RgbThreshFilter::filtr(Mat& p_src)
 void RgbThreshFilter::filtr(const Mat& p_src, Mat& p_dst)
 {
 	inRange(p_src, cv::Scalar(m_rgbThreshParams.low_b, m_rgbThreshParams.low_g, m_rgbThreshParams.low_r)
-		  , cv::Scalar(m_rgbThreshParams.high_b, m_rgbThreshParams.high_g, m_rgbThreshParams.high_r), p_dst);
+		   ,cv::Scalar(m_rgbThreshParams.high_b, m_rgbThreshParams.high_g, m_rgbThreshParams.high_r), p_dst);
 }
 
 void RgbThreshFilter::setRgbThreshParams(int lowr, int lowg, int lowb, int highr, int highg, int highb)

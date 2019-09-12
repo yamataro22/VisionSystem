@@ -3,6 +3,8 @@
 #include "BaseFrame.h"
 #include "CoordinateSystem.h"
 #include "RectangularShape.h"
+#include <optional>
+#include <algorithm>
 
 using namespace cv;
 using namespace std;
@@ -12,30 +14,26 @@ ContourCreator::ContourCreator(const Mat& s):src(s)
 	findContours();
 }
 
-ContourCreator::~ContourCreator()
-{
-	delete objToDraw;
-}
-
 void ContourCreator::addFrame()
 {
-	if (findRectangles() != nullptr)
+    findRectangles();
+
+	if(!minRect.empty())
 	{
 		auto index = getBiggestRectangleIndex(minRect, contours);
 		Point2f rect_points[4];	//biggest rectangle points
 		minRect[index].points(rect_points);
-		shapesToDraw.push_back(new BaseFrame(rect_points));
+        mainFrame = std::make_shared<BaseFrame>(rect_points);
+		shapesToDraw.push_back(mainFrame);
 	}
-
 }
-
 void ContourCreator::addCoordinateSystem()
 {
 	findRectangles();
 	auto index = getBiggestRectangleIndex(minRect, contours);	//base rectangular index
 	Point2f rect_points[4];
 	minRect[index].points(rect_points);
-	shapesToDraw.push_back(new CoordinateSystem(rect_points));
+	shapesToDraw.push_back(std::make_unique<CoordinateSystem>(rect_points));
 }
 
 void ContourCreator::addObject()
@@ -51,14 +49,13 @@ void ContourCreator::addObject()
 			minRect.erase(minRect.begin() + frameIndex);
 		}
 
-
 		Point2f rect_points[4];
 		if (minRect.size() > 0)
 		{
 			minRect[0].points(rect_points);
-			objToDraw = new RectangularShape(rect_points);
-			updateCenterCoords(rect_points);
-			shapesToDraw.push_back(objToDraw);
+			detectedObject = std::make_shared<RectangularShape>(rect_points);
+			updateCenterCoords();
+			shapesToDraw.push_back(detectedObject);
 		}
 	}
 }
@@ -70,13 +67,13 @@ void ContourCreator::addAllRectangles()
 		findRectangles();
 	}
 	eliminateDuplicates(minRect, getBiggestRectangleIndex(minRect, contours), 5);
-	for (int i = 0; i < minRect.size(); i++)
-	{
-		Point2f rectPoints[4];
-		minRect[i].points(rectPoints);
-		shapesToDraw.push_back(new BaseFrame(rectPoints));
-	}
-	cout << "Wykryto " << minRect.size() << "prostokatow" << endl;
+	for(auto& l_minRect : minRect)
+    {
+        Point2f rectPoints[4];
+        l_minRect.points(rectPoints);
+        shapesToDraw.push_back(std::make_unique<BaseFrame>(rectPoints));
+    }
+	cout << "Detected " << minRect.size() << " rectangles" << endl;
 }
 
 void ContourCreator::drawContoursOnly(Mat& dst)
@@ -89,36 +86,32 @@ void ContourCreator::drawContoursOnly(Mat& dst)
 	}
 }
 
-std::unique_ptr<coordPair> ContourCreator::getRelativeObjectCoords()
+std::optional<Coords> ContourCreator::getRelativeObjectCoords()
 {
-	if(objToDraw == nullptr)
+	if(detectedObject)
 	{
-		return nullptr;
+        return std::make_pair(mainFrame->getXCoord(centerCoords), mainFrame->getYCoord(centerCoords));
 	}
 	else
 	{
-		coordPair l_coordTab;
-		BaseFrame * frame = dynamic_cast<BaseFrame*>(shapesToDraw[0]);
-		l_coordTab.first = frame->getXCoord(centerCoords);
-		l_coordTab.second = frame->getYCoord(centerCoords);
-
-		return std::make_unique<coordPair>(l_coordTab);
+        return std::nullopt;
 	}
 }
 
-std::unique_ptr<coordPair>  ContourCreator::getAbsoluteObjectCoords(double p_width, double p_height)
+std::optional<Coords> ContourCreator::getAbsoluteObjectCoords(double p_width, double p_height)
 {
 	
 	auto l_scaledCoords = getFrameScale(p_width, p_height);
-	coordPair l_realCoords;
 	auto l_relCoords = getRelativeObjectCoords();
-	if (l_relCoords == nullptr || l_scaledCoords == nullptr)
+
+	if (!(l_relCoords || l_scaledCoords))
 	{
-		return nullptr;
+		return std::nullopt;
 	}
-	l_realCoords.first = l_relCoords->first * l_scaledCoords->first;
-	l_realCoords.second = l_relCoords->second * l_scaledCoords->second;
-	return std::make_unique<coordPair>(l_realCoords);
+	else
+    {
+        return std::make_pair(l_relCoords->first * l_scaledCoords->first, l_relCoords->second * l_scaledCoords->second);
+    }
 }
 
 void ContourCreator::addText(Mat& src, const char * text)
@@ -140,34 +133,28 @@ void ContourCreator::findContours()
 	cv::findContours(src, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
 }
 
-void* ContourCreator::findRectangles()
+void ContourCreator::findRectangles()
 {
-	if (contours.size() == 0)
-	{
-		return nullptr;
-	}
-	else
-	{
-		minRect.reserve(contours.size());
-		for (size_t i = 0; i < contours.size(); i++)
-		{
-			minRect.push_back(minAreaRect(contours[i]));
-		}
-	}
-	
+	if (contours.size() == 0) return;
+
+    minRect.reserve(contours.size());
+
+    for(auto& l_contour : contours)
+    {
+        minRect.push_back(minAreaRect(l_contour));
+    }
 }
 
-void ContourCreator::updateCenterCoords(Point2f * framePoints)
+void ContourCreator::updateCenterCoords()
 {
-	if (objToDraw == nullptr)
+	if (detectedObject)
 	{
-		cout << "Add coordinates firstly" << endl;
-		exit(1);
+        centerCoords = detectedObject->getCenterPoint();
 	}
 	else
 	{
-		RectangularShape *rect = static_cast<RectangularShape*>(objToDraw);
-		centerCoords = rect->getCenterPoint();
+        cout << "Add coordinates firstly" << endl;
+        exit(1);
 	}
 }
 
@@ -177,15 +164,16 @@ void ContourCreator::drawShapes(Mat& dst)
 	{
 		dst = Mat::zeros(src.size(), CV_8UC3);
 	}
-	for (int i = 0; i < shapesToDraw.size(); i++)
-	{
-		shapesToDraw[i]->drawShape(dst);
-	}
+	for(const auto& shape: shapesToDraw)
+    {
+        shape->drawShape(dst);
+    }
 }
 
 int ContourCreator::getBiggestRectangleIndex(const vector<RotatedRect> &boundRect, const vector<vector<Point>>& contours)
 {
 	int index = 0;
+
 	for (int i = 0, max = 0; i < boundRect.size(); i++)
 	{
 		auto straightRect = boundRect[i].boundingRect();
@@ -200,14 +188,8 @@ int ContourCreator::getBiggestRectangleIndex(const vector<RotatedRect> &boundRec
 
 void ContourCreator::sortByArea(vector<RotatedRect> rectangles)
 {
-	for (int i = 0; i < rectangles.size()-1; i++)
-	{
-		for (int j = 0; j < rectangles.size() - 1; j++)
-		{
-			if (rectangles[j + 1].size.area() > rectangles[j].size.area())
-				swap(rectangles[j + 1], rectangles[j]);
-		}
-	}
+    auto compFuntion = [](const RotatedRect& a, const RotatedRect& b){ return b.size.area() > a.size.area(); };
+    std::sort(rectangles.begin(),rectangles.end(), compFuntion);
 }
 
 void ContourCreator::eliminateDuplicates(vector<RotatedRect>& rectangles, int dupIndex, int percentError)
@@ -215,38 +197,30 @@ void ContourCreator::eliminateDuplicates(vector<RotatedRect>& rectangles, int du
 	auto frameArea = rectangles[dupIndex].size.area();
 	auto max = frameArea + percentError * 0.01*frameArea;
 	auto min = frameArea - percentError * 0.01*frameArea;
-	for (int i = 0; i < rectangles.size(); i++)
-	{
-		if (i == dupIndex)
-		{
-			continue;
-		}
-		else
-		{
-			auto currentArea = rectangles[i].size.area();
-			if ((currentArea > min) && (currentArea < max))
-			{
-				rectangles.erase(rectangles.begin() + i);
-			}
-		}
-	}
 
+    for (int i = 0; i < rectangles.size(); i++)
+    {
+        if (i != dupIndex)
+        {
+            auto currentArea = rectangles[i].size.area();
+
+            if ((currentArea > min) && (currentArea < max))
+            {
+                rectangles.erase(rectangles.begin() + i);
+            }
+        }
+    }
 }
 
-std::unique_ptr<coordPair> ContourCreator::getFrameScale(double width, double height)
+std::optional<Coords> ContourCreator::getFrameScale(double width, double height)
 {
-	if (shapesToDraw.size() != 0)
-	{
-		coordPair l_scaleTab;
-		BaseFrame * frame = dynamic_cast<BaseFrame*>(shapesToDraw[0]);
-		l_scaleTab.first = width / frame->getWidth();
-		l_scaleTab.second = height / frame->getHeight();
-
-		return std::make_unique<coordPair>(l_scaleTab);
-	}
-	else
-	{
-		return nullptr;
+    if (shapesToDraw.empty())
+    {
+	    return std::nullopt;
+    }
+    else
+    {
+		return std::make_pair(width / mainFrame->getWidth(), height / mainFrame->getHeight());
 	}
 }
 

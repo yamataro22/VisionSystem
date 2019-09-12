@@ -2,16 +2,6 @@
 #include "Filter.h"
 #include "GrayFilter.h"
 
-
-
-Calibration::Calibration()
-{
-}
-
-Calibration::~Calibration()
-{
-}
-
 void Calibration::setSource(Mat& source)
 {
 	pCalib = source;
@@ -71,7 +61,7 @@ void Calibration::setGrayFilter(void* obj)
 {
 	GrayFilter l_grayFilter;
 
-	if (((Calibration*)obj)->pCalib.channels() == 1)	//jeœli jest w formacie jednokana³owym
+	if (((Calibration*)obj)->pCalib.channels() == 1)	//jeï¿½li jest w formacie jednokanaï¿½owym
 		((Calibration*)obj)->pCalib.copyTo(((Calibration*)obj)->aCalib);
 	else
 		l_grayFilter.filtr(((Calibration*)obj)->pCalib, ((Calibration*)obj)->aCalib);
@@ -135,61 +125,51 @@ void Calibration::onCannyThreshTrackbar(int, void * object)
 void Calibration::on_low_r_thresh_trackbar(int, void *object)
 {
 	Calibration* myCalib = (Calibration*)object;
-	Mat dst; 
 	myCalib->m_rgbThreshParams.low_r = min(myCalib->m_rgbThreshParams.high_r - 1, myCalib->m_rgbThreshParams.low_r);
-	inRange(myCalib->pCalib, Scalar(myCalib->m_rgbThreshParams.low_b, myCalib->m_rgbThreshParams.low_g, myCalib->m_rgbThreshParams.low_r)
-		, Scalar(myCalib->m_rgbThreshParams.high_b, myCalib->m_rgbThreshParams.high_g, myCalib->m_rgbThreshParams.high_r), dst);
-	imshow("currentCalib", dst);
+    performRgbCalibrationOnImage(myCalib);
 }
 
 void Calibration::on_high_r_thresh_trackbar(int, void *object)
 {
 	Calibration* myCalib = (Calibration*)object;
-	Mat dst;
 	myCalib->m_rgbThreshParams.high_r = max(myCalib->m_rgbThreshParams.high_r - 1, myCalib->m_rgbThreshParams.low_r);
-	inRange(myCalib->pCalib, Scalar(myCalib->m_rgbThreshParams.low_b, myCalib->m_rgbThreshParams.low_g, myCalib->m_rgbThreshParams.low_r)
-		, Scalar(myCalib->m_rgbThreshParams.high_b, myCalib->m_rgbThreshParams.high_g, myCalib->m_rgbThreshParams.high_r), dst);
-	imshow("currentCalib", dst);
+    performRgbCalibrationOnImage(myCalib);
 }
 
 void Calibration::on_low_g_thresh_trackbar(int, void *object)
 {
 	Calibration* myCalib = (Calibration*)object;
-	Mat dst;
 	myCalib->m_rgbThreshParams.low_g = min(myCalib->m_rgbThreshParams.high_g - 1, myCalib->m_rgbThreshParams.low_g);
-	inRange(myCalib->pCalib, Scalar(myCalib->m_rgbThreshParams.low_b, myCalib->m_rgbThreshParams.low_g, myCalib->m_rgbThreshParams.low_r)
-		, Scalar(myCalib->m_rgbThreshParams.high_b, myCalib->m_rgbThreshParams.high_g, myCalib->m_rgbThreshParams.high_r), dst);
-	imshow("currentCalib", dst);
+    performRgbCalibrationOnImage(myCalib);
 }
 
 void Calibration::on_high_g_thresh_trackbar(int, void *object)
 {
 	Calibration* myCalib = (Calibration*)object;
-	Mat dst;
 	myCalib->m_rgbThreshParams.high_g = max(myCalib->m_rgbThreshParams.high_g - 1, myCalib->m_rgbThreshParams.low_g);
-	inRange(myCalib->pCalib, Scalar(myCalib->m_rgbThreshParams.low_b, myCalib->m_rgbThreshParams.low_g, myCalib->m_rgbThreshParams.low_r)
-		, Scalar(myCalib->m_rgbThreshParams.high_b, myCalib->m_rgbThreshParams.high_g, myCalib->m_rgbThreshParams.high_r), dst);
-	imshow("currentCalib", dst);
+    performRgbCalibrationOnImage(myCalib);
 }
 
 void Calibration::on_low_b_thresh_trackbar(int, void *object)
 {
 	Calibration* myCalib = (Calibration*)object;
-	Mat dst;
 	myCalib->m_rgbThreshParams.low_b = min(myCalib->m_rgbThreshParams.high_b - 1, myCalib->m_rgbThreshParams.low_b);
-	inRange(myCalib->pCalib, Scalar(myCalib->m_rgbThreshParams.low_b, myCalib->m_rgbThreshParams.low_g, myCalib->m_rgbThreshParams.low_r)
-		, Scalar(myCalib->m_rgbThreshParams.high_b, myCalib->m_rgbThreshParams.high_g, myCalib->m_rgbThreshParams.high_r), dst);
-	imshow("currentCalib", dst);
+    performRgbCalibrationOnImage(myCalib);
 }
 
 void Calibration::on_high_b_thresh_trackbar(int, void *object)
 {
 	Calibration* myCalib = (Calibration*)object;
-	Mat dst;
 	myCalib->m_rgbThreshParams.high_b = max(myCalib->m_rgbThreshParams.high_b - 1, myCalib->m_rgbThreshParams.low_b);
-	inRange(myCalib->pCalib, Scalar(myCalib->m_rgbThreshParams.low_b, myCalib->m_rgbThreshParams.low_g, myCalib->m_rgbThreshParams.low_r)
-		, Scalar(myCalib->m_rgbThreshParams.high_b, myCalib->m_rgbThreshParams.high_g, myCalib->m_rgbThreshParams.high_r), dst);
-	imshow("currentCalib", dst);
+    performRgbCalibrationOnImage(myCalib);
+}
+
+void Calibration::performRgbCalibrationOnImage(Calibration* object)
+{
+    Mat dst;
+    inRange(object->pCalib, object->m_rgbThreshParams.getLowRgbScalar(),
+            object->m_rgbThreshParams.getHighRgbScalar(), dst);
+    imshow("currentCalib", dst);
 }
 
 

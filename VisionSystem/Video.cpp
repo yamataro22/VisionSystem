@@ -6,6 +6,7 @@
 #include "BinaryThreshFilter.h"
 #include "CannyFilter.h"
 #include "GrayFilter.h"
+#include <mutex>
 
 using namespace cv;
 using namespace std;
@@ -13,7 +14,7 @@ using namespace std;
 
 Video::Video()
 {
-	createFilTab();
+    createFiltersTab();
 	m_videoCap.open("http://192.168.1.10:8080/video?x.mjpeg");
 	checkIfOpened();
 	m_jobList.push_back(&Video::source);
@@ -22,7 +23,7 @@ Video::Video()
 
 Video::Video(const char * IPadress)
 {
-	createFilTab();
+	createFiltersTab();
 	m_videoCap.open(IPadress);
 	checkIfOpened();
 	m_jobList.push_back(&Video::source);
@@ -63,24 +64,22 @@ void Video::addFilter(std::unique_ptr<Filter> p_filter)
 	m_filTab.push_back(std::move(p_filter));
 }
 
-
-void Video::clearFilTab()
+void Video::startStreaming(Coords& p_coords, std::mutex& p_mutex)
 {
-	m_filTab.clear();
-}
+    do
+    {
+        readFrame();
+        for(auto l_job : m_jobList)
+        {
+            (this->*l_job)();
+        }
+        if(m_currentCoords)
+        {
+            std::lock_guard<std::mutex> guard(p_mutex);
+            p_coords = *m_currentCoords;
+        }
 
-void Video::startStreaming(std::shared_ptr<coords> p_coords)
-{
-	while (1)
-	{
-		readFrame();
-		for (int i = 0; i < m_jobList.size(); i++)
-			(this->*m_jobList[i])();
-		p_coords = std::move(m_currentCoords);
-		if (waitForKey(30, 27))
-			break;
-
-	}
+    } while(!waitForKey(30, 27));
 }
 
 void Video::addJob(void (Video::*f)())
@@ -162,11 +161,6 @@ void Video::addObjectOnFrame()
 	imshow("rectObj", m_currentFrame);
 }
 
-
-Video::~Video()
-{
-}
-
 void Video::checkIfOpened()
 {
 	if (!m_videoCap.isOpened())  // if not success, exit program
@@ -186,7 +180,7 @@ void Video::readFrame()
 	}
 }
 
-void Video::createFilTab()
+void Video::createFiltersTab()
 {
 	m_filTab.push_back(std::make_unique<GrayFilter>());
 	m_filTab.push_back(std::make_unique<MedianBlurFilter>());
@@ -215,14 +209,13 @@ bool Video::waitForKey(int ms, int key)
 
 void Video::checkCoords(double scale)
 {
-	if (m_currentCoords != nullptr)
-	{
-		if (m_currentCoords->first > scale*SHEET_WIDTH || m_currentCoords->first > scale*SHEET_HEIGHT)
-		{
-			m_currentCoords = nullptr;
-		}
-			
-	}
+    if (m_currentCoords)
+    {
+        if (m_currentCoords->first > scale*SHEET_WIDTH || m_currentCoords->first > scale*SHEET_HEIGHT)
+        {
+            m_currentCoords = std::nullopt;
+        }
+    }
 }
 
 

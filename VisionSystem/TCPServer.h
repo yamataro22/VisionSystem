@@ -1,5 +1,6 @@
 #pragma once
 #include <WS2tcpip.h>	//header for winsock func
+#include "Defines.hpp"
 #include <iostream>
 #include <string>
 
@@ -21,7 +22,7 @@ public:
 
 	//send a message to a specified client
 	void sendMsg(int clientSocket, std::string msg);
-	void sendMsg(int clientSocket, int* tab);
+	void sendMsg(int clientSocket, Coords&);
 
 	//initialize winsock
 	bool init();

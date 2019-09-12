@@ -23,60 +23,42 @@ void BaseFrame::drawShape(cv::Mat & src)
 double BaseFrame::getXCoord(Point2f center)
 {
 	vector<Point2f> tempTab = pointsTab;
-
-	for (int i = 0; i < tempTab.size() - 1; i++)
-	{
-		for (int j = 0; j < tempTab.size() - 1; j++)
-		{
-			if (tempTab[j + 1].x < tempTab[j].x)
-				swap(tempTab[j + 1], tempTab[j]);
-		}
-	}
-
+    sortVectorByXAscending(tempTab);
 	return getDistanceLinePoint(tempTab[0], tempTab[1], center);
 }
 
 double BaseFrame::getYCoord(Point2d center)
 {
 	vector<Point2f> tempTab = pointsTab;
-	for (int i = 0; i < tempTab.size() - 1; i++)
-	{
-		for (int j = 0; j < tempTab.size() - 1; j++)
-		{
-			if (tempTab[j + 1].y > tempTab[j].y)
-				swap(tempTab[j + 1], tempTab[j]);
-		}
-	}
+    sortVectorByYDescending(tempTab);
 	return getDistanceLinePoint(tempTab[0], tempTab[1], center);
+}
+
+void sortVectorByXAscending(std::vector<Point2f>& p_vec)
+{
+    auto sortingFunction = [](const Point2f& a, const Point2f& b){ return b.y < a.y; };
+    std::sort(p_vec.begin(), p_vec.end(), sortingFunction);
+}
+
+void sortVectorByYDescending(std::vector<Point2f>& p_vec)
+{
+    auto sortingFunction = [](const Point2f& a, const Point2f& b){ return b.y < a.y; };
+    std::sort(p_vec.begin(), p_vec.end(), sortingFunction);
 }
 
 double BaseFrame::getWidth()
 {
 	vector<Point2f> tempTab = pointsTab;
 
-	for (int i = 0; i < tempTab.size() - 1; i++)
-	{
-		for (int j = 0; j < tempTab.size() - 1; j++)
-		{
-			if (tempTab[j + 1].y > tempTab[j].y)
-				swap(tempTab[j + 1], tempTab[j]);
-		}
-	}
+    sortVectorByYDescending(tempTab);
+
 	return std::sqrt((tempTab[0].x - tempTab[1].x)*(tempTab[0].x - tempTab[1].x) + (tempTab[0].y - tempTab[1].y)*(tempTab[0].y - tempTab[1].y));
 }
 
 double BaseFrame::getHeight()
 {
 	vector<Point2f> tempTab = pointsTab;
-
-	for (int i = 0; i < tempTab.size() - 1; i++)
-	{
-		for (int j = 0; j < tempTab.size() - 1; j++)
-		{
-			if (tempTab[j + 1].x < tempTab[j].x)
-				swap(tempTab[j + 1], tempTab[j]);
-		}
-	}
+    sortVectorByXAscending(tempTab);
 	return std::sqrt((tempTab[0].x - tempTab[1].x)*(tempTab[0].x - tempTab[1].x) + (tempTab[0].y - tempTab[1].y)*(tempTab[0].y - tempTab[1].y));
 }
 

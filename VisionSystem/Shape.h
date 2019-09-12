@@ -8,11 +8,12 @@ class Shape
 public:
 	Shape(cv::Point2f points[]);
 	virtual void drawShape(cv::Mat& dst) {};
-
-	virtual ~Shape() = default;
+	virtual Point2f getCenterPoint()
+	{
+	    return Point2f(0,0);
+	};
 protected:
 	vector<cv::Point2f> pointsTab;
-	Point2f *pointsOld;
 	int lineThicness = 8;
 };
 

@@ -29,22 +29,21 @@ public:
 
 private:
 
-
 	Mat pCalib;
 	Mat aCalib;
 
-
 	int threshBinaryParam = 120;
 	int blurParam = 0;
+
 	CannyParameters m_cannyParams;
 	RgbThreshParameters m_rgbThreshParams;
 
-	void configureTrackbar(const char* trackbarName, int* param, int maxVal, void func(int, void*), void* obj); //dodanie trackbaru do okna i koniguracja parametrów
+	void configureTrackbar(const char* trackbarName, int* param, int maxVal, void func(int, void*), void* obj); //dodanie trackbaru do okna i koniguracja parametrï¿½w
 	static void setGrayFilter(void* obj);
-
 	void checkIfEmpty(Mat& pic);
-	static void onThreshTrackbar(int, void* obj);
-	static void onBlurTrackbar(int, void* obj);
+    static void performRgbCalibrationOnImage(Calibration*);
+	static void onThreshTrackbar(int, void*);
+	static void onBlurTrackbar(int, void*);
 	static void onCannyThreshTrackbar(int, void*);
 	static void on_low_r_thresh_trackbar(int, void *);
 	static void on_high_r_thresh_trackbar(int, void *);

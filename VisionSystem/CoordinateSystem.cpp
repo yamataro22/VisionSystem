@@ -14,58 +14,57 @@ CoordinateSystem::~CoordinateSystem()
 
 void CoordinateSystem::drawShape(cv::Mat & dst)
 {
-	giveCoordPoints(pointsOld);
+    setLowestPointToTheEndOfPointTab();
 
-	line(dst, pointsOld[3], pointsOld[2], Scalar(255, 0, 0), 9);
-	line(dst, pointsOld[3], pointsOld[1], Scalar(255, 0, 0), 9);
+	line(dst, pointsTab[3], pointsTab[2], Scalar(255, 0, 0), 9);
+	line(dst, pointsTab[3], pointsTab[1], Scalar(255, 0, 0), 9);
 }
 
-void CoordinateSystem::sortPoints(Point2f points[])
+void CoordinateSystem::sortPoints()
 {
 	int n = 4;
 
-	for (int j = 0; j < n; j++)			//sortowanie malej¹ce po Y
+	for (int j = 0; j < n; j++)			//sortowanie malejï¿½ce po Y
 	{
 		for (int i = n - 1; i > 0; i--)
 		{
-			if (points[i].y > points[i - 1].y)
+			if (pointsTab[i].y > pointsTab[i - 1].y)
 			{
-				swap(points[i], points[i - 1]);
+				swap(pointsTab[i], pointsTab[i - 1]);
 			}
 		}
 	}
 
-	if (points[3].x < points[2].x)
+	if (pointsTab[3].x < pointsTab[2].x)
 	{
-		swap(points[3], points[2]);
-		swap(points[0], points[1]);
+		swap(pointsTab[3], pointsTab[2]);
+		swap(pointsTab[0], pointsTab[1]);
 	}
 }
 
-void CoordinateSystem::showPoints(Point2f p[])
+void CoordinateSystem::showPoints()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		cout << "P" << i << ": x:" << p[i].x << "; y:" << p[i].y << endl;
+		cout << "P" << i << ": x:" << pointsTab[i].x << "; y:" << pointsTab[i].y << endl;
 	}
 }
 
 void CoordinateSystem::drawCoordinateSystem(Mat& currentMat, Point2f tab[])
 {
-	
+	//TODO
 }
 
-void CoordinateSystem::giveCoordPoints(Point2f points[])
+void CoordinateSystem::setLowestPointToTheEndOfPointTab()
 {
-	sortPoints(points);
-	double leftSide = norm(points[3] - points[1]);
-	double rightSide = norm(points[3] - points[2]);
-	if (rightSide > leftSide)	//sytuacja gdy punkt œrodkowy nie jest najni¿szy
+	sortPoints();
+	double leftSide = norm(pointsTab[3] - pointsTab[1]);
+	double rightSide = norm(pointsTab[3] - pointsTab[2]);
+	if (rightSide > leftSide)	//case when middle point is not the lowest one
 	{
-		if (points[1].y > points[2].y)
-			swap(points[1], points[2]);
-		swap(points[2], points[3]);
-		swap(points[0], points[1]);
+		if (pointsTab[1].y > pointsTab[2].y)
+			swap(pointsTab[1], pointsTab[2]);
+		swap(pointsTab[2], pointsTab[3]);
+		swap(pointsTab[0], pointsTab[1]);
 	}
-	//funkcja zwraca pkt centralny uk³. wspó³ jako ostatni element talbicy
 }

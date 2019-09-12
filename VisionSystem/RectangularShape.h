@@ -7,7 +7,7 @@ class RectangularShape :
 public:
 	RectangularShape(cv::Point2f ppintTab[]);
 	~RectangularShape();
-	Point2f getCenterPoint();
+	Point2f getCenterPoint() override;
 	void drawShape(cv::Mat& dst) override;
 
 };

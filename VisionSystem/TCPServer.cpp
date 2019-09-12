@@ -1,4 +1,6 @@
 #include "TCPServer.h"
+#include "Defines.hpp"
+#include <sstream>
 
 
 
@@ -18,28 +20,12 @@ void TCPServer::sendMsg(int clientSocket, std::string msg)
 	send(clientSocket, msg.c_str(), msg.size(), 0);
 }
 
-void TCPServer::sendMsg(int clientSocket, int * tab)
+void TCPServer::sendMsg(int clientSocket, Coords& p_coords)
 {
-	int charIndex = 0;
-	std::string int1 = std::to_string(tab[0]);
-	std::string int2 = std::to_string(tab[1]);
-	int length = int1.length() + int2.length() + 3;
-
-	char* buf = new char[length];
-
-	for (; charIndex < int1.length();)
-	{
-		buf[charIndex++] = int1.at(charIndex);
-	}
-	buf[charIndex++] = (char)',';
-	for (int i = 0, max = charIndex + int2.length(); charIndex < max;i++)
-	{
-		buf[charIndex++] = int2.at(i);
-	}
-	buf[charIndex++] = 0x0D;
-	buf[charIndex] = 0x0A;
-	
-	send(clientSocket, buf, length, 0);
+    std::stringstream ss;
+    ss << p_coords.first << ',' << p_coords.second << 0x0D << 0x0A;
+    std::string outputMessage = ss.str();
+	send(clientSocket, outputMessage.c_str(), outputMessage.size(), 0);
 }
 
 bool TCPServer::init()

@@ -10,9 +10,10 @@ public:
 	void drawShape(cv::Mat& dst) override;
 
 private:
-	void sortPoints(Point2f points[]);
-	void showPoints(Point2f p[]);
+	void sortPoints();
+	void showPoints();
+    void setLowestPointToTheEndOfPointTab();
 	void drawCoordinateSystem(Mat& currentMat, Point2f tab[]);
-	void giveCoordPoints(Point2f points[]);
+
 };
 

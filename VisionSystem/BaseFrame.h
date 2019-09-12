@@ -14,7 +14,8 @@ public:
 	double getWidth();
 	double getHeight();
 private:
-
-	double getDistanceLinePoint(Point2f p1, Point2f p2, Point2f p3);
+	double getDistanceLinePoint(Point2f, Point2f, Point2f);
+    void sortVectorByXAscending(std::vector<Point2f>&);
+    void sortVectorByYDescending(std::vector<Point2f>&);
 };
 
