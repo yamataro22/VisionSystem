@@ -3,6 +3,7 @@
 class BinaryThreshFilter : public Filter
 {
 public:
+
 	BinaryThreshFilter(int p_thresh = 140);
 	~BinaryThreshFilter();
 

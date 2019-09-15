@@ -4,9 +4,8 @@
 class CoordinateSystem : public Shape
 {
 public:
+
 	CoordinateSystem(cv::Point2f ppintTab[]);
-	~CoordinateSystem();
-	
 	void drawShape(cv::Mat& dst) override;
 
 private:

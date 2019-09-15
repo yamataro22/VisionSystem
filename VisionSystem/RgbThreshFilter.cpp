@@ -21,15 +21,6 @@ Scalar RgbThreshParameters::getHighRgbScalar() {
     return Scalar(high_b, high_g, high_r);;
 }
 
-RgbThreshFilter::RgbThreshFilter()
-{
-}
-
-
-RgbThreshFilter::~RgbThreshFilter()
-{
-}
-
 void RgbThreshFilter::filtr(Mat& p_src)
 {
 	inRange(p_src, cv::Scalar(m_rgbThreshParams.low_b, m_rgbThreshParams.low_g, m_rgbThreshParams.low_r)

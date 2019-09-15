@@ -1,15 +1,8 @@
 #include "CoordinateSystem.h"
 
-
-
-
 CoordinateSystem::CoordinateSystem(cv::Point2f pointTab[]) : Shape(pointTab)
 {
 
-}
-
-CoordinateSystem::~CoordinateSystem()
-{
 }
 
 void CoordinateSystem::drawShape(cv::Mat & dst)

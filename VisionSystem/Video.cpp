@@ -12,19 +12,10 @@ using namespace cv;
 using namespace std;
 
 
-Video::Video()
-{
-    createFiltersTab();
-	m_videoCap.open("http://192.168.1.10:8080/video?x.mjpeg");
-	checkIfOpened();
-	m_jobList.push_back(&Video::source);
-	m_jobList.push_back(&Video::processed);
-}
-
-Video::Video(const char * IPadress)
+Video::Video(const std::string p_iPadress = "http://192.168.1.10:8080/video?x.mjpeg")
 {
 	createFiltersTab();
-	m_videoCap.open(IPadress);
+	m_videoCap.open(p_iPadress.c_str());
 	checkIfOpened();
 	m_jobList.push_back(&Video::source);
 	m_jobList.push_back(&Video::processed);

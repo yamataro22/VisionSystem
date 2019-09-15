@@ -106,6 +106,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\openCV\opencv\build\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -170,11 +171,13 @@
     <ClInclude Include="BinaryThreshFilter.h" />
     <ClInclude Include="CannyFilter.h" />
     <ClInclude Include="CoordinateSystem.h" />
+    <ClInclude Include="Defines.hpp" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="Calibration.h" />
     <ClInclude Include="Contours.h" />
     <ClInclude Include="GrayFilter.h" />
     <ClInclude Include="MedianBlurFilter.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="RgbThreshFilter.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="RectangularShape.h" />

@@ -20,8 +20,8 @@ enum jobs { source, processed, contours, frame, coordinateSystem, objectOnFrame}
 class Video
 {
 public:
-	Video();
-	Video(const char* IPadress);
+
+	Video(const std::string);
 
 	void calibrate();
 

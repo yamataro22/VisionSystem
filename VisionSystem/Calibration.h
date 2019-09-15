@@ -14,9 +14,6 @@ class Calibration
 {
 public:
 
-	Calibration();
-	~Calibration();
-
 	void setSource(Mat& source);
 	void startCalibrationThreshold();
 	void startCalibrationBlur();

@@ -1,15 +1,8 @@
 #include "BaseFrame.h"
-
-
-
-
+#include <vector>
 
 BaseFrame::BaseFrame(cv::Point2f ppintTab[]) : Shape(ppintTab)
 {	
-}
-
-BaseFrame::~BaseFrame()
-{
 }
 
 void BaseFrame::drawShape(cv::Mat & src)
@@ -34,13 +27,13 @@ double BaseFrame::getYCoord(Point2d center)
 	return getDistanceLinePoint(tempTab[0], tempTab[1], center);
 }
 
-void sortVectorByXAscending(std::vector<Point2f>& p_vec)
+void BaseFrame::sortVectorByXAscending(std::vector<Point2f>& p_vec)
 {
     auto sortingFunction = [](const Point2f& a, const Point2f& b){ return b.y < a.y; };
     std::sort(p_vec.begin(), p_vec.end(), sortingFunction);
 }
 
-void sortVectorByYDescending(std::vector<Point2f>& p_vec)
+void BaseFrame::sortVectorByYDescending(std::vector<Point2f>& p_vec)
 {
     auto sortingFunction = [](const Point2f& a, const Point2f& b){ return b.y < a.y; };
     std::sort(p_vec.begin(), p_vec.end(), sortingFunction);

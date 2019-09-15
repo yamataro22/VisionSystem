@@ -4,6 +4,8 @@
 #include <opencv2/imgcodecs.hpp>
 #include <vector>
 #include <memory>
+#include <optional>
+
 using coordPair = std::pair<double, double>;
 class Shape;
 class CoordinateSystem;

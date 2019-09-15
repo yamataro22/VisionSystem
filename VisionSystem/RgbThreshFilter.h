@@ -18,8 +18,7 @@ struct RgbThreshParameters
 class RgbThreshFilter : public Filter
 {
 public:
-	RgbThreshFilter();
-	~RgbThreshFilter();
+
 	void filtr(Mat& src) override;
 	void filtr(const Mat& src, Mat& dst) override;
 	void setRgbThreshParams(int, int, int, int, int, int);

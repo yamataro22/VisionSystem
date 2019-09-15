@@ -1,5 +1,6 @@
 #pragma once
 #include "Shape.h"
+#include <vector>
 #include <cmath>
 
 class BaseFrame :
@@ -7,7 +8,6 @@ class BaseFrame :
 {
 public:
 	BaseFrame(cv::Point2f ppintTab[]);
-	~BaseFrame();
 	void drawShape(cv::Mat& dst) override;
 	double getXCoord(Point2f center);
 	double getYCoord(Point2d center);
